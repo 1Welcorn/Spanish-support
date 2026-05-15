@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
-import { supabase } from '../services/supabase';
+import { db } from '../services/firebase';
+import { doc, getDoc, updateDoc, setDoc, collection, query, where, getDocs, increment } from 'firebase/firestore';
 
 export const useStudentJourney = (userId: string) => {
   const [stats, setStats] = useState<any>(null);
@@ -12,25 +13,14 @@ export const useStudentJourney = (userId: string) => {
     
     try {
       // 1. Fetch Profile (XP, Level, Streak)
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('id, xp, level, streak, stars') // Request specific columns instead of *
-        .eq('id', userId)
-        .maybeSingle();
-
-      if (profileError) {
-        console.warn('Profile sync skipped (likely schema mismatch):', profileError.message);
-      }
+      const profileRef = doc(db, 'profiles', userId);
+      const profileSnap = await getDoc(profileRef);
+      const profileData = profileSnap.exists() ? profileSnap.data() : null;
 
       // 2. Fetch Unit Progress
-      const { data: progressData, error: progressError } = await supabase
-        .from('student_progress')
-        .select('unit_id, status, score')
-        .eq('profile_id', userId);
-
-      if (progressError) {
-        console.warn('Progress sync skipped:', progressError.message);
-      }
+      const q = query(collection(db, 'student_progress'), where('profile_id', '==', userId));
+      const progressSnap = await getDocs(q);
+      const progressData = progressSnap.docs.map((d: any) => d.data());
 
       setStats(profileData || { xp: 0, level: 1, streak: 0, stars: 0 });
       setProgress(progressData || []);
@@ -47,30 +37,22 @@ export const useStudentJourney = (userId: string) => {
     
     try {
       // 1. Update XP
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('xp')
-        .eq('id', userId)
-        .single();
-
-      const { error: xpError } = await supabase
-        .from('profiles')
-        .update({ xp: (profile?.xp || 0) + earnedXp })
-        .eq('id', userId);
-
-      if (xpError) throw xpError;
+      const profileRef = doc(db, 'profiles', userId);
+      await updateDoc(profileRef, {
+        xp: increment(earnedXp)
+      }).catch(async (e: any) => {
+        // Create if doesn't exist
+        await setDoc(profileRef, { xp: earnedXp, level: 1, streak: 0, stars: 0 });
+      });
 
       // 2. Mark Unit as Completed
-      const { error: progError } = await supabase
-        .from('student_progress')
-        .upsert({ 
-          profile_id: userId, 
-          unit_id: unitId, 
-          status: 'completed',
-          completed_at: new Date().toISOString() 
-        }, { onConflict: 'profile_id,unit_id' });
-
-      if (progError) throw progError;
+      const docId = `${userId}_${unitId}`;
+      await setDoc(doc(db, 'student_progress', docId), {
+        profile_id: userId,
+        unit_id: unitId,
+        status: 'completed',
+        completed_at: new Date().toISOString()
+      }, { merge: true });
 
       // Refresh data locally
       await fetchJourneyData();
@@ -85,15 +67,16 @@ export const useStudentJourney = (userId: string) => {
     if (!userId) return { success: false };
     
     try {
-      const { data, error } = await supabase.rpc('add_student_rewards', {
-        xp_to_add: xpGained,
-        stars_to_add: starsEarned
+      const profileRef = doc(db, 'profiles', userId);
+      await updateDoc(profileRef, {
+        xp: increment(xpGained),
+        stars: increment(starsEarned)
+      }).catch(async () => {
+        await setDoc(profileRef, { xp: xpGained, stars: starsEarned, level: 1, streak: 0 });
       });
-
-      if (error) throw error;
       
       await fetchJourneyData();
-      return { success: true, data };
+      return { success: true };
     } catch (err) {
       console.error('Error adding student rewards:', err);
       return { success: false, error: err };

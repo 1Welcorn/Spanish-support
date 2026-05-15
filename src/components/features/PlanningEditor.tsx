@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { supabase } from '../../services/supabase';
+import { storage } from '../../services/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Save, Plus, Trash2, BookOpen, Target, Lightbulb, ChevronLeft, Eye, X, Globe, Lock, Unlock, Bold, Italic, Palette, Eraser, AlignLeft, AlignCenter, AlignRight, AlignJustify, List, Type, Monitor, Image as ImageIcon, Zap, AlertTriangle, Smartphone, Clock, Check, Sparkles, ChefHat, Headphones, User, Building2, GraduationCap, ClipboardList } from 'lucide-react';
 import { UnitCard, VideoPlayerV5 } from './Activities';
 import { COLORS } from '../../constants';
@@ -323,25 +324,15 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `uploads/${fileName}`;
 
-      const { data, error } = await supabase.storage
-        .from('media')
-        .upload(filePath, file);
-
-      if (error) throw error;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('media')
-        .getPublicUrl(filePath);
+      const storageRef = ref(storage, filePath);
+      await uploadBytes(storageRef, file);
+      const publicUrl = await getDownloadURL(storageRef);
 
       activeUploadCallback(publicUrl);
       setIsDirty(true);
     } catch (err: any) {
       console.error('Upload error:', err);
-      if (err.message === 'Bucket not found') {
-        alert('Erro no upload: O "bucket" chamado "media" não foi encontrado no seu Supabase.\n\nPara corrigir:\n1. Vá ao painel do Supabase -> Storage\n2. Crie um novo bucket chamado: media\n3. Marque como "Public bucket"');
-      } else {
-        alert('Error en la subida: ' + (err.message || 'Error desconocido'));
-      }
+      alert('Error en la carga. Verifica que el Storage esté configurado en Firebase.');
     } finally {
       setLoading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -544,8 +535,8 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
                    border: '1px solid #e2e8f0', 
                    boxShadow: '0 20px 50px rgba(0,0,0,0.04)',
                    overflow: 'hidden',
-                   display: 'flex',
-                                     {/* CARD HEADER */}
+                   display: 'flex', flexDirection: 'column' }}>
+                   {/* CARD HEADER */}
                    <div style={{ background: '#f8fafc', padding: '20px 30px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <div style={{ background: '#10b981', color: 'white', padding: '8px', borderRadius: '12px' }}><Globe size={18} /></div>
@@ -603,10 +594,8 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
                              </div>
                            </div>
                          </div>
-                        </div>                    </div>
                         </div>
                       </div>
-
                       <StylingControls 
                          item={item} 
                          onChange={(updates) => {

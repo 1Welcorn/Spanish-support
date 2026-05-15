@@ -1,11 +1,24 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { UserRole } from '../types';
-import { supabase } from '../services/supabase';
-import type { User } from '@supabase/supabase-js';
+import { auth } from '../services/firebase';
+import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
+import type { User } from 'firebase/auth';
+
+export interface AppUser {
+  id: string;
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  photoURL: string | null;
+  user_metadata?: {
+    full_name?: string;
+    avatar_url?: string;
+  };
+}
 
 interface AuthContextType {
   role: UserRole;
-  user: User | null;
+  user: AppUser | null;
   loading: boolean;
   authError: string | null;
   signInWithGoogle: () => Promise<void>;
@@ -21,62 +34,76 @@ const MEDIATOR_EMAILS: string[] = [];
 
 const CUSTOM_STUDENTS = [
   { name: 'ASMA QARI ZADAH', pin: 'asma', email: 'asma@pontes.com' },
-  { name: 'HOSNA QARI ZADAH', pin: 'hosna', email: 'hosna@pontes.com' }
+  { name: 'HOSNA QARI ZADAH', pin: 'hosna', email: 'hosna@pontes.com' },
+  { name: 'Ione Jordão Ribeiro', pin: 'ione', email: 'ione@pontes.com' }
 ];
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AppUser | null>(null);
   const [role, setRole] = useState<UserRole>(null);
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
     console.log("AuthProvider: Initializing...");
-    // Verificar sessão atual
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("AuthProvider: Session found:", !!session);
-      if (session?.user) {
-        handleUser(session.user);
-      } else {
-        const savedMock = localStorage.getItem('dari_mock_user');
-        if (savedMock) {
-          const mockUser = JSON.parse(savedMock);
-          setUser(mockUser);
-          setRole('student');
-        }
+    
+    // Check initial mock user state
+    const savedMock = localStorage.getItem('dari_mock_user');
+    if (savedMock) {
+      const mockUser = JSON.parse(savedMock);
+      setUser(mockUser);
+      setRole('student');
+      setLoading(false);
+    }
+
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser: any) => {
+      console.log("AuthProvider: Auth state changed:", !!firebaseUser);
+      if (firebaseUser) {
+        handleUser(firebaseUser);
+      } else if (!savedMock) {
+        setUser(null);
+        setRole(null);
       }
       setLoading(false);
-    }).catch(err => {
-      console.error("AuthProvider: Error getting session:", err);
-      setLoading(false);
     });
 
-    // Escutar mudanças de auth
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      handleUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    return () => unsubscribe();
   }, []);
 
-  const handleUser = (user: User | null) => {
-    console.log("AuthContext: Handling user:", user?.email);
-    setUser(user);
-    if (user && user.email) {
-      if (ADMIN_EMAILS.includes(user.email)) {
-        console.log("AuthContext: User is ADMIN");
-        setRole('admin');
-        localStorage.setItem('dari_role', 'admin');
-      } else if (MEDIATOR_EMAILS.includes(user.email)) {
-        console.log("AuthContext: User is MEDIATOR");
-        setRole('mediator');
-        localStorage.setItem('dari_role', 'mediator');
-      } else {
-        console.log("AuthContext: User is STUDENT (default)");
-        setRole('student');
-        localStorage.setItem('dari_role', 'student');
+  const handleUser = (firebaseUser: User | null) => {
+    console.log("AuthContext: Handling user:", firebaseUser?.email);
+    
+    if (firebaseUser) {
+      const normalizedUser: AppUser = {
+        id: firebaseUser.uid,
+        uid: firebaseUser.uid,
+        email: firebaseUser.email,
+        displayName: firebaseUser.displayName,
+        photoURL: firebaseUser.photoURL,
+        user_metadata: {
+          full_name: firebaseUser.displayName || '',
+          avatar_url: firebaseUser.photoURL || ''
+        }
+      };
+      setUser(normalizedUser);
+
+      if (firebaseUser.email) {
+        if (ADMIN_EMAILS.includes(firebaseUser.email)) {
+          console.log("AuthContext: User is ADMIN");
+          setRole('admin');
+          localStorage.setItem('dari_role', 'admin');
+        } else if (MEDIATOR_EMAILS.includes(firebaseUser.email)) {
+          console.log("AuthContext: User is MEDIATOR");
+          setRole('mediator');
+          localStorage.setItem('dari_role', 'mediator');
+        } else {
+          console.log("AuthContext: User is STUDENT (default)");
+          setRole('student');
+          localStorage.setItem('dari_role', 'student');
+        }
       }
     } else {
+      setUser(null);
       setRole(null);
       localStorage.removeItem('dari_role');
     }
@@ -84,16 +111,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithGoogle = async () => {
     setAuthError(null);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/`,
-        queryParams: {
-          prompt: 'select_account'
-        }
-      }
-    });
-    if (error) console.error('Error logging in with Google:', error.message);
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+      await signInWithPopup(auth, provider);
+    } catch (error: any) {
+      console.error('Error logging in with Google:', error.message);
+      setAuthError(error.message);
+    }
   };
 
   const signInWithName = async (name: string, pin: string): Promise<boolean> => {
@@ -101,11 +126,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const student = CUSTOM_STUDENTS.find(s => s.name.toUpperCase() === name.toUpperCase() && s.pin.toLowerCase() === pin.toLowerCase());
     
     if (student) {
-      // Para simplificar e permitir login sem e-mail real no Supabase Auth,
-      // usaremos um mock user object e setaremos a role manualmente.
-      const mockUser: any = {
+      // Mock user for PIN login
+      const mockUser: AppUser = {
         id: `mock-${student.name.replace(/\s+/g, '-').toLowerCase()}`,
+        uid: `mock-${student.name.replace(/\s+/g, '-').toLowerCase()}`,
         email: student.email,
+        displayName: student.name,
+        photoURL: null,
         user_metadata: { full_name: student.name }
       };
       
@@ -115,7 +142,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('dari_mock_user', JSON.stringify(mockUser));
       return true;
     } else {
-      setAuthError("Nome ou senha incorretos.");
+      setAuthError("Nombre o PIN incorrectos.");
       return false;
     }
   };
@@ -127,7 +154,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
+    try {
+      await signOut(auth);
+    } catch (err) {
+      console.error("Error signing out from Firebase:", err);
+    }
     setRole(null);
     setUser(null);
     localStorage.removeItem('dari_role');

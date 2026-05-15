@@ -19,7 +19,8 @@ import { useDariData } from './hooks/useData';
 import { useStudentJourney } from './hooks/useStudentJourney';
 import { speechService } from './utils/speech';
 import { DEFAULT_UNITS } from './constants';
-import { supabase } from './services/supabase';
+import { db } from './services/firebase';
+import { setDoc, doc } from 'firebase/firestore';
 
 export const App: React.FC = () => {
   useEffect(() => {
@@ -80,12 +81,11 @@ export const App: React.FC = () => {
                 external_links: defaultUnit.external_links
               };
 
-              const { error } = await supabase.from('units').upsert(unitToSync);
-              
-              if (error) {
-                console.error(`Error syncing unit ${defaultUnit.id}:`, error.message);
-              } else {
+              try {
+                await setDoc(doc(db, 'units', defaultUnit.id), unitToSync, { merge: true });
                 needsRefresh = true;
+              } catch (error: any) {
+                console.error(`Error syncing unit ${defaultUnit.id}:`, error.message);
               }
             }
           }

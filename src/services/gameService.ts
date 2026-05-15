@@ -1,23 +1,19 @@
-import { supabase } from './supabase';
+import { db } from './firebase';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
 /**
  * Fetches the vocabulary list for a specific unit.
- * Note: Ensure your 'units' table has a 'vocabulary_list' column (JSONB or Text Array).
- * If not, you can add it via SQL: ALTER TABLE units ADD COLUMN vocabulary_list JSONB DEFAULT '[]'::jsonb;
  */
 export const getUnitVocabulary = async (unitId: string): Promise<string[]> => {
   try {
-    const { data, error } = await supabase
-      .from('units')
-      .select('vocabulary_list') 
-      .eq('id', unitId)
-      .single();
+    const docRef = doc(db, 'units', unitId);
+    const snap = await getDoc(docRef);
 
-    if (error) {
-      console.error('Error fetching unit vocabulary:', error);
+    if (!snap.exists()) {
       return [];
     }
     
+    const data = snap.data();
     // Returns e.g., ["Fridge", "Spoon", "Oven"]
     return Array.isArray(data.vocabulary_list) ? data.vocabulary_list : []; 
   } catch (err) {
@@ -30,10 +26,11 @@ export const getUnitVocabulary = async (unitId: string): Promise<string[]> => {
  * Updates the vocabulary list for a unit (Admin only).
  */
 export const updateUnitVocabulary = async (unitId: string, vocabulary: string[]) => {
-  const { error } = await supabase
-    .from('units')
-    .update({ vocabulary_list: vocabulary })
-    .eq('id', unitId);
-
-  return { success: !error, error };
+  try {
+    const docRef = doc(db, 'units', unitId);
+    await updateDoc(docRef, { vocabulary_list: vocabulary });
+    return { success: true, error: null };
+  } catch (error) {
+    return { success: false, error };
+  }
 };
