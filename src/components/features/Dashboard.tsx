@@ -41,12 +41,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const totalStars = stats?.stars || (sessionsCount * 10);
 
   const handleSupportClick = () => {
-    const text = `Olá Prof. ${mediatorName}, sou a Ione! Preciso de uma ajuda com as atividades de hoje.`;
+    const text = `Hola Prof. ${mediatorName}, ¡soy Ione! Necesito ayuda con las actividades de hoy.`;
     const cleanPhone = mediatorPhone.replace(/\D/g, '');
     window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`, '_blank');
   };
 
-  if (statsLoading) return <div className="screen-loading">Carregando sua jornada...</div>;
+  if (statsLoading) return <div className="screen-loading">Cargando tu viaje...</div>;
 
   return (
     <div className="dash-v5-container" style={{ background: 'var(--bg)', minHeight: '100vh' }}>
@@ -62,8 +62,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
         alignItems: 'center'
       }}>
         <div className="dash-v5-profile">
-          <h1 style={{ fontSize: '20px', fontWeight: 900, color: 'var(--ink1)', margin: 0, direction: 'rtl', fontFamily: 'Fraunces, serif' }}>
-            English classes سلام! ✨
+          <h1 style={{ fontSize: '20px', fontWeight: 900, color: 'var(--ink1)', margin: 0, fontFamily: 'Fraunces, serif' }}>
+            ¡Hola! ✨
           </h1>
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginTop: '4px' }}>
             <div style={{ flex: 1, minWidth: '150px' }}>
@@ -89,8 +89,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
       <div style={{ padding: '0 24px' }}>
         {/* Título do Módulo Super Compacto */}
         <div className="module-intro-v5" style={{ textAlign: 'center', marginBottom: '8px', marginTop: '8px' }}>
-           <h2 style={{ fontSize: '24px', fontWeight: 900, color: 'var(--ink1)', margin: '0', direction: 'rtl', fontFamily: 'Fraunces, serif' }}>
-              ماژول ۱: مکالمه پایه 🚀
+           <h2 style={{ fontSize: '24px', fontWeight: 900, color: 'var(--ink1)', margin: '0', fontFamily: 'Fraunces, serif' }}>
+              Módulo 1: Conversación Básica 🚀
            </h2>
         </div>
 
@@ -189,11 +189,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
             <div style={{ width: '44px', height: '44px', background: 'var(--lavender)', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '18px' }}>
               {mediatorName.charAt(0)}
             </div>
-            <div style={{ direction: 'rtl', textAlign: 'right' }}>
-               <div style={{ fontSize: '15px', fontWeight: 900, color: 'var(--ink1)' }}>استاد {mediatorName}</div>
-               <div style={{ fontSize: '11px', color: 'var(--ink3)', fontWeight: 600 }}>معلم شما (Seu Mediador)</div>
+            <div style={{ textAlign: 'left' }}>
+               <div style={{ fontSize: '15px', fontWeight: 900, color: 'var(--ink1)' }}>Profesor(a) {mediatorName}</div>
+               <div style={{ fontSize: '11px', color: 'var(--ink3)', fontWeight: 600 }}>Tu Profesor</div>
             </div>
-            <div style={{ background: '#25D366', color: 'white', padding: '8px 16px', borderRadius: '12px', fontSize: '12px', fontWeight: 900 }}>تماس 💬</div>
+            <div style={{ background: '#25D366', color: 'white', padding: '8px 16px', borderRadius: '12px', fontSize: '12px', fontWeight: 900 }}>Mensaje 💬</div>
           </div>
         </footer>
       </div>

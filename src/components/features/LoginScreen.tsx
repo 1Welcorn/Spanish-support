@@ -38,7 +38,7 @@ const StudentLoginCard: React.FC<{ name: string }> = ({ name }) => {
         </div>
         <div style={{ flex: 1 }}>
           <div style={{ fontWeight: 900, fontSize: '14px', color: 'var(--ink1)' }}>{name}</div>
-          <div style={{ fontSize: '11px', color: 'var(--ink4)' }}>Clique para entrar</div>
+          <div style={{ fontSize: '11px', color: 'var(--ink4)' }}>Haz clic para entrar</div>
         </div>
         <ArrowRight size={18} color="var(--border)" />
       </button>
@@ -47,13 +47,13 @@ const StudentLoginCard: React.FC<{ name: string }> = ({ name }) => {
 
   return (
     <div style={{ background: 'white', border: '2px solid var(--color-accent-blue)', borderRadius: '24px', padding: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', position: 'relative' }}>
-      <button onClick={() => setShowPin(false)} style={{ position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', color: 'var(--ink4)', cursor: 'pointer', fontSize: '12px' }}>voltar</button>
+      <button onClick={() => setShowPin(false)} style={{ position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', color: 'var(--ink4)', cursor: 'pointer', fontSize: '12px' }}>volver</button>
       <div style={{ fontWeight: 900, fontSize: '16px', marginBottom: '15px', textAlign: 'center', color: 'var(--color-accent-blue)' }}>{name}</div>
       <div style={{ position: 'relative', marginBottom: '15px' }}>
         <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ink4)' }}><Lock size={16} /></div>
         <input 
           type="password" 
-          placeholder="Digite sua senha..."
+          placeholder="Ingresa tu contraseña..."
           value={pin}
           onChange={(e) => setPin(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
@@ -102,12 +102,12 @@ export const LoginScreen: React.FC<{ settings: any }> = () => {
         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
           <img src={projectLogo} alt="Logo" style={{ width: '280px', height: 'auto' }} />
         </div>
-        <h1 className="login-title" style={{ direction: 'rtl', marginBottom: '8px' }}>
-          خوش آمدید <br/><span style={{fontSize: '22px', color: '#64748b', fontWeight: 700}}>(Bem-vinda!)</span>
+        <h1 className="login-title" style={{ marginBottom: '8px' }}>
+          ¡Bienvenido(a)! <br/><span style={{fontSize: '22px', color: '#64748b', fontWeight: 700}}>(Welcome!)</span>
         </h1>
-        <p className="login-sub" style={{ direction: 'rtl', marginTop: '10px' }}>
-          پلتفرم یادگیری شما <br />
-          <span style={{fontSize: '13px', color: '#94a3b8'}}>(Sua plataforma de aprendizado)</span>
+        <p className="login-sub" style={{ marginTop: '10px' }}>
+          Tu plataforma de aprendizaje <br />
+          <span style={{fontSize: '13px', color: '#94a3b8'}}>(Your learning platform)</span>
         </p>
 
         {authError && (
@@ -152,13 +152,13 @@ export const LoginScreen: React.FC<{ settings: any }> = () => {
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
               </svg>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                <span style={{ fontWeight: 800, fontSize: '15px' }}>Admin / Mediador</span>
+                <span style={{ fontWeight: 800, fontSize: '15px' }}>Admin / Profesor</span>
               </div>
             </button>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '10px 0' }}>
               <div style={{ flex: 1, height: '1px', background: 'var(--border)' }}></div>
-              <span style={{ fontSize: '11px', color: 'var(--ink4)', fontWeight: 700 }}>ACESSO ALUNAS</span>
+              <span style={{ fontSize: '11px', color: 'var(--ink4)', fontWeight: 700 }}>ACCESO ALUMNOS</span>
               <div style={{ flex: 1, height: '1px', background: 'var(--border)' }}></div>
             </div>
 
@@ -175,7 +175,7 @@ export const LoginScreen: React.FC<{ settings: any }> = () => {
         )}
 
         <div style={{ marginTop: '40px', fontSize: '11px', color: 'var(--ink4)', textAlign: 'center' }}>
-          Projeto Pontes da Esperança · 2026
+          Proyecto Puentes de Esperanza · 2026
         </div>
       </div>
     </div>

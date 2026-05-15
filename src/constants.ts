@@ -18,52 +18,52 @@ export const COLORS: Record<string, { main: string; light: string; dark: string;
 };
 
 export const DEFAULT_UNITS: Unit[] = [
-  {id:'u1',color:'natural',sort_order:0,title:'Nossa cozinha',title_dari:'لغات آشپزخانه',sub:'Aula 1',
+  {id:'u1',color:'natural',sort_order:0,title:'Nuestra cocina',title_dari:'Kitchen Vocabulary',sub:'Clase 1',
    icon3D: '/unit-icons/aula-1.png', iconOutline: '/unit-icons/aula-1-off.png',
-   brief:'Antes de começar: vá à cozinha com ela e segure objetos reais. Diga o nome em inglês devagar.',
-   plan_c:'Vocabulário da cozinha; palavras-objeto',plan_h:'Identificar palavras em inglês por contexto',plan_e:'Objetos reais; leitura em voz alta',plan_a:'Apontamento correto',wa:'Aula 1 — Nossa cozinha',questions:[{q:'O que significa SPOON?',type:'mc',opts:['Colher','Garfo','Faca','Panela']}]},
+   brief:'Antes de empezar: ve a la cocina con él/ella y sostén objetos reales. Di el nombre en inglés lentamente.',
+   plan_c:'Vocabulario de la cocina; palabras-objeto',plan_h:'Identificar palabras en inglés por contexto',plan_e:'Objetos reales; lectura en voz alta',plan_a:'Señalamiento correcto',wa:'Clase 1 — Nuestra cocina',questions:[{q:'¿Qué significa SPOON?',type:'mc',opts:['Cuchara','Tenedor','Cuchillo','Olla']}]},
   
-  {id:'u7',color:'natural',sort_order:1,title:'Cores e Frutas',title_dari:'رنگ‌ها و میوه‌ها',sub:'Aula 2',
+  {id:'u7',color:'natural',sort_order:1,title:'Colores y Frutas',title_dari:'Colors and Fruits',sub:'Clase 2',
    icon3D: '/unit-icons/Aula 7 Cores e Frutas.png', iconOutline: '/unit-icons/Aula 7 Cores e Frutas-não iniciada.png',
-   brief:'Use frutas reais.',plan_c:'Cores e frutas',plan_h:'Associar cores a objetos',plan_e:'Frutas reais',plan_a:'Identificação correta',wa:'Aula 2 — Cores e Frutas',questions:[{q:'Como se diz VERMELHO em inglês?',type:'mc',opts:['Red','Blue','Green','Yellow']}]},
+   brief:'Usa frutas reales.',plan_c:'Colores y frutas',plan_h:'Asociar colores a objetos',plan_e:'Frutas reales',plan_a:'Identificación correcta',wa:'Clase 2 — Colores y Frutas',questions:[{q:'¿Cómo se dice ROJO en inglés?',type:'mc',opts:['Red','Blue','Green','Yellow']}]},
   
-  {id:'u8',color:'natural',sort_order:2,title:'Números e Quantidade',title_dari:'اعداد و مقدار',sub:'Aula 3',
+  {id:'u8',color:'natural',sort_order:2,title:'Números y Cantidad',title_dari:'Numbers and Quantity',sub:'Clase 3',
    icon3D: '/unit-icons/Aula 8 Números e Quantidade.png', iconOutline: '/unit-icons/Aula 8 Números e Quantidade-não iniciada.png',
-   brief:'Conte objetos na mesa.',plan_c:'Numbers 1-10',plan_h:'Contar até 10',plan_e:'Contagem física',plan_a:'Contagem correta',wa:'Aula 3 — Números',questions:[{q:'Como se diz 3 em inglês?',type:'mc',opts:['Three','One','Five','Ten']}]},
+   brief:'Cuenta objetos en la mesa.',plan_c:'Numbers 1-10',plan_h:'Contar hasta 10',plan_e:'Conteo físico',plan_a:'Conteo correcto',wa:'Clase 3 — Números',questions:[{q:'¿Cómo se dice 3 en inglés?',type:'mc',opts:['Three','One','Five','Ten']}]},
   
-  {id:'u6',color:'natural',sort_order:3,title:'Receita',title_dari:'طرز تهیه غذا',sub:'Aula 4',
+  {id:'u6',color:'natural',sort_order:3,title:'Receta',title_dari:'Recipe',sub:'Clase 4',
    icon3D: '/unit-icons/aula-6.png', iconOutline: '/unit-icons/aula-6-off.png',
-   brief:'Ela é a professora hoje.',plan_c:'Receita; verbos de instrução',plan_h:'Produzir frase instrucional',plan_e:'Inversão de papel',plan_a:'1 frase completa',wa:'Aula 4 — Receita',questions:[{q:'Qual prato você quer me ensinar hoje?',type:'text'}]},
+   brief:'Él/Ella es el profesor(a) hoy.',plan_c:'Receta; verbos de instrucción',plan_h:'Producir frase instruccional',plan_e:'Inversión de rol',plan_a:'1 frase completa',wa:'Clase 4 — Receta',questions:[{q:'¿Qué plato me quieres enseñar hoy?',type:'text'}]},
   
-  {id:'u4',color:'natural',sort_order:4,title:'Inglês no Cotidiano',title_dari:'انگلیسی در زندگی روزمره',sub:'Aula 5',
+  {id:'u4',color:'natural',sort_order:4,title:'Inglés Cotidiano',title_dari:'English in Daily Life',sub:'Clase 5',
    icon3D: '/unit-icons/aula-4.png', iconOutline: '/unit-icons/aula-4-off.png',
-   brief:'Separe embalagens reais.',plan_c:'Inglês no cotidiano',plan_h:'Reconhecer palavras',plan_e:'Embalagens reais',plan_a:'Identificação de 1 palavra',wa:'Aula 5 — Inglês no dia a dia',questions:[{q:'O que significa RICE?',type:'mc',opts:['Arroz','Feijão','Frango','Sal']}]},
+   brief:'Separa envases reales.',plan_c:'Inglés en lo cotidiano',plan_h:'Reconocer palabras',plan_e:'Envases reales',plan_a:'Identificación de 1 palabra',wa:'Clase 5 — Inglés en el día a día',questions:[{q:'¿Qué significa RICE?',type:'mc',opts:['Arroz','Frijoles','Pollo','Sal']}]},
   
-  {id:'u3',color:'natural',sort_order:5,title:'Apresentação Pessoal',title_dari:'معرفی خود',sub:'Aula 6',
+  {id:'u3',color:'natural',sort_order:5,title:'Presentación Personal',title_dari:'Personal Presentation',sub:'Clase 6',
    icon3D: '/unit-icons/aula-3.png', iconOutline: '/unit-icons/aula-3-off.png',
-   brief:'"My name is...".',plan_c:'Apresentação pessoal',plan_h:'Produzir frase simples',plan_e:'Mediador modela',plan_a:'Produção oral',wa:'Aula 6 — Apresentação',questions:[{q:'O que significa MY NAME IS?',type:'mc',opts:['Meu nome é','Eu gosto de','Eu tenho','Onde fica']}]},
+   brief:'"My name is...".',plan_c:'Presentación personal',plan_h:'Producir frase simple',plan_e:'El mediador modela',plan_a:'Producción oral',wa:'Clase 6 — Presentación',questions:[{q:'¿Qué significa MY NAME IS?',type:'mc',opts:['Mi nombre es','Me gusta','Yo tengo','Dónde está']}]},
   
-  {id:'u10',color:'natural',sort_order:6,title:'Partes do Corpo',title_dari:'اعضای بدن',sub:'Aula 7',
+  {id:'u10',color:'natural',sort_order:6,title:'Partes del Cuerpo',title_dari:'Body Parts',sub:'Clase 7',
    icon3D: '/unit-icons/Partes do Corpo.png', iconOutline: '/unit-icons/Partes do Corpo-não iniciada.png',
-   brief:'Touch your head.',plan_c:'Partes do corpo',plan_h:'Identificar partes',plan_e:'Mímica',plan_a:'Identificação correta',wa:'Aula 7 — Corpo',questions:[{q:'Onde fica o seu NOSE?',type:'mc',opts:['Nariz','Olho','Boca','Orelha']}]},
+   brief:'Touch your head.',plan_c:'Partes del cuerpo',plan_h:'Identificar partes',plan_e:'Mímica',plan_a:'Identificación correcta',wa:'Clase 7 — Cuerpo',questions:[{q:'¿Dónde está tu NOSE?',type:'mc',opts:['Nariz','Ojo','Boca','Oreja']}]},
   
-  {id:'u9',color:'natural',sort_order:7,title:'Minha Família',title_dari:'خانواده من',sub:'Aula 8',
+  {id:'u9',color:'natural',sort_order:7,title:'Mi Familia',title_dari:'My Family',sub:'Clase 8',
    icon3D: '/unit-icons/Minha Família.png', iconOutline: '/unit-icons/Minha Família-não iniciada.png',
-   brief:'Use fotos da família.',plan_c:'Membros da família',plan_h:'Identificar membros',plan_e:'Fotos reais',plan_a:'Identificação correta',wa:'Aula 8 — Família',questions:[{q:'Como se diz MÃE em inglês?',type:'mc',opts:['Mother','Father','Sister','Brother']}]},
+   brief:'Usa fotos de la familia.',plan_c:'Miembros de la familia',plan_h:'Identificar miembros',plan_e:'Fotos reales',plan_a:'Identificación correcta',wa:'Clase 8 — Familia',questions:[{q:'¿Cómo se dice MADRE en inglés?',type:'mc',opts:['Mother','Father','Sister','Brother']}]},
   
-  {id:'u5',color:'natural',sort_order:8,title:'Gêneros Digitais',title_dari:'موضوعات دیجیتال',sub:'Aula 9',
+  {id:'u5',color:'natural',sort_order:8,title:'Temas Digitales',title_dari:'Digital Genres',sub:'Clase 9',
    icon3D: '/unit-icons/aula-5.png', iconOutline: '/unit-icons/aula-5-off.png',
-   brief:'Use o celular REAL.',plan_c:'Gêneros digitais',plan_h:'Identificar STORY, LIKE',plan_e:'Celular real',plan_a:'Identificação correta',wa:'Aula 9 — Inglês no celular',questions:[{q:'O que é uma STORY?',type:'mc',opts:['Foto/vídeo que some','Mensagem','Seguir','Comentário']}]},
+   brief:'Usa el celular REAL.',plan_c:'Géneros digitales',plan_h:'Identificar STORY, LIKE',plan_e:'Celular real',plan_a:'Identificación correcta',wa:'Clase 9 — Inglés en el celular',questions:[{q:'¿Qué es una STORY?',type:'mc',opts:['Foto/video temporal','Mensaje','Seguir','Comentario']}]},
 
-  {id:'u11',color:'natural',sort_order:9,title:'Animais e Sons',title_dari:'حیوانات و صداها',sub:'Aula 10',
+  {id:'u11',color:'natural',sort_order:9,title:'Animales y Sonidos',title_dari:'Animals and Sounds',sub:'Clase 10',
    icon3D: '/unit-icons/Animais e Sons.png', iconOutline: '/unit-icons/Animais e Sons-não iniciada.png',
-   brief:'Imite os sons dos animais.',plan_c:'Animais e sons',plan_h:'Associar animal ao som',plan_e:'Sons e mímicas',plan_a:'Identificação correta',wa:'Aula 10 — Animais',questions:[{q:'Como se diz CACHORRO em inglês?',type:'mc',opts:['Dog','Cat','Fish','Lion']}]},
+   brief:'Imita los sonidos de los animales.',plan_c:'Animales y sonidos',plan_h:'Asociar animal al sonido',plan_e:'Sonidos y mímicas',plan_a:'Identificación correcta',wa:'Clase 10 — Animales',questions:[{q:'¿Cómo se dice PERRO en inglés?',type:'mc',opts:['Dog','Cat','Fish','Lion']}]},
 
-  {id:'u2',color:'natural',sort_order:10,title:'Compreensão Oral',title_dari:'درک شنوایی',sub:'Aula 11',
+  {id:'u2',color:'natural',sort_order:10,title:'Comprensión Oral',title_dari:'Oral Comprehension',sub:'Clase 11',
    icon3D: '/unit-icons/aula-2.png', iconOutline: '/unit-icons/aula-2-off.png',
-   brief:'Repita DUAS vezes.',plan_c:'Compreensão oral',plan_h:'Identificar palavra-chave',plan_e:'Leitura em voz alta',plan_a:'Identificação correta',wa:'Aula 11 — Escuta em inglês',questions:[{q:'Quem cozinha em "My MOTHER cooks"?',type:'mc',opts:['Mãe','Avó','Irmã','Tia']}]},
+   brief:'Repite DOS veces.',plan_c:'Comprensión oral',plan_h:'Identificar palabra clave',plan_e:'Lectura en voz alta',plan_a:'Identificación correcta',wa:'Clase 11 — Escucha en inglés',questions:[{q:'¿Quién cocina en "My MOTHER cooks"?',type:'mc',opts:['Madre','Abuela','Hermana','Tía']}]},
   
-  {id:'u12',color:'natural',sort_order:11,title:'Revisão do módulo',title_dari:'مرور درس',sub:'Aula 12',
+  {id:'u12',color:'natural',sort_order:11,title:'Revisión del módulo',title_dari:'Module Review',sub:'Clase 12',
    icon3D: '/unit-icons/aula-1.png', iconOutline: '/unit-icons/aula-1-off.png',
-   brief:'Celebrar o progresso.',plan_c:'Revisão geral',plan_h:'Recuperar termos',plan_e:'Celebração',plan_a:'Participação ativa',wa:'Aula 12 — Revisão',questions:[{q:'Qual sua palavra favorita?',type:'text'}]}
+   brief:'Celebrar el progreso.',plan_c:'Revisión general',plan_h:'Recuperar términos',plan_e:'Celebración',plan_a:'Participación activa',wa:'Clase 12 — Revisión',questions:[{q:'¿Cuál es tu palabra favorita?',type:'text'}]}
 ];

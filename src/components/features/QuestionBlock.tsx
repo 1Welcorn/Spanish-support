@@ -88,7 +88,7 @@ export const QuestionBlock: React.FC<QuestionBlockProps> = ({
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
     } else {
-      window.alert('Erro ao salvar resposta.');
+      window.alert('Error al guardar respuesta.');
     }
   };
 
@@ -156,14 +156,14 @@ export const QuestionBlock: React.FC<QuestionBlockProps> = ({
           <button className="admin-btn-v4" onClick={() => setIsEditing(!isEditing)} title="Editar">
             <Edit2 size={14} />
           </button>
-          <button className="admin-btn-v4 del" onClick={onDelete} title="Excluir">
+          <button className="admin-btn-v4 del" onClick={onDelete} title="Eliminar">
             <Trash2 size={14} />
           </button>
         </div>
       )}
 
       <div className="q-badge-v4" style={{ background: currentColors.accent }}>
-        QUESTÃO {index + 1}
+        PREGUNTA {index + 1}
       </div>
 
       <div className="q-body-v4">
@@ -175,21 +175,21 @@ export const QuestionBlock: React.FC<QuestionBlockProps> = ({
                 type="text" 
                 value={editQ} 
                 onChange={(e) => setEditQ(e.target.value)}
-                placeholder="Título da pergunta"
+                placeholder="Título de la pregunta"
                 className="admin-inline-input title"
               />
             </div>
             {(editType === 'text' || editType === 'paragraph') && (
               <div className="editor-row" style={{ marginTop: 12 }}>
                 <label style={{ display: 'block', fontSize: 12, fontWeight: 800, color: '#64748b', marginBottom: 6 }}>
-                  Resposta correta / esperada (referência para correção — a aluna não vê)
+                  Respuesta correcta / esperada (referencia para corrección — el alumno no ve)
                 </label>
                 <textarea
                   className="admin-inline-input"
                   rows={editType === 'paragraph' ? 4 : 2}
                   value={editOpenCorrect}
                   onChange={(e) => setEditOpenCorrect(e.target.value)}
-                  placeholder="Ex: spoon, colher (aceite várias linhas como respostas aceitáveis)"
+                  placeholder="Ej: spoon, cuchara (acepta varias líneas como respuestas válidas)"
                   style={{ minHeight: editType === 'paragraph' ? 100 : 56 }}
                 />
               </div>
@@ -197,7 +197,7 @@ export const QuestionBlock: React.FC<QuestionBlockProps> = ({
             {(['mc', 'checkbox'] as QuestionType[]).includes(editType) && (
               <div className="editor-row" style={{ marginTop: 12 }}>
                 <label style={{ display: 'block', fontSize: 12, fontWeight: 800, color: '#64748b', marginBottom: 6 }}>
-                  Opções e resposta(s) correta(s)
+                  Opciones y respuesta(s) correcta(s)
                 </label>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {editOpts.map((opt, i) => (
@@ -224,13 +224,13 @@ export const QuestionBlock: React.FC<QuestionBlockProps> = ({
                         style={{ flex: 1 }}
                       />
                       <button className="admin-cancel-btn" onClick={() => removeOption(i)} style={{ whiteSpace: 'nowrap' }}>
-                        Remover
+                        Eliminar
                       </button>
                     </div>
                   ))}
                   <div>
                     <button className="admin-add-btn" onClick={addOption} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                      <Plus size={14} /> Adicionar opção
+                      <Plus size={14} /> Añadir opción
                     </button>
                   </div>
                 </div>
@@ -238,7 +238,7 @@ export const QuestionBlock: React.FC<QuestionBlockProps> = ({
             )}
             <div className="editor-footer" style={{ marginTop: '16px', display: 'flex', gap: '8px' }}>
               <button className="admin-save-btn" onClick={handleConfirmEdit} style={{ background: currentColors.main, color: '#fff' }}>
-                <Check size={16} /> Aplicar Mudanças
+                <Check size={16} /> Aplicar Cambios
               </button>
               <button className="admin-cancel-btn" onClick={() => setIsEditing(false)}>
                 Cancelar
@@ -313,7 +313,7 @@ export const QuestionBlock: React.FC<QuestionBlockProps> = ({
                   <input 
                     type="text"
                     className="q-input-v4"
-                    placeholder="Escreva sua resposta aqui..."
+                    placeholder="Escribe tu respuesta aquí..."
                     value={tempAnswer}
                     onChange={(e) => setTempAnswer(e.target.value)}
                     onBlur={(e) => handleSave(e.target.value)}
@@ -326,7 +326,7 @@ export const QuestionBlock: React.FC<QuestionBlockProps> = ({
                 <div className="q-input-wrap-v4">
                   <textarea 
                     className="q-input-v4 paragraph"
-                    placeholder="Escreva sua resposta longa..."
+                    placeholder="Escribe tu respuesta larga..."
                     value={tempAnswer}
                     onChange={(e) => setTempAnswer(e.target.value)}
                     onBlur={(e) => handleSave(e.target.value)}
@@ -346,10 +346,10 @@ export const QuestionBlock: React.FC<QuestionBlockProps> = ({
               className={`q-mediator-btn-v4 ${showMediatorGuide ? 'active' : ''}`}
               onClick={() => setShowMediatorGuide(!showMediatorGuide)}
             >
-              <Info size={16} /> {showMediatorGuide ? 'Ocultar Dicas' : 'Dicas da Mediadora'}
+              <Info size={16} /> {showMediatorGuide ? 'Ocultar Consejos' : 'Consejos de la Mediadora'}
             </button>
           )}
-          {showSuccess && <div className="q-save-status-v4"><Check size={14} /> Resposta enviada!</div>}
+          {showSuccess && <div className="q-save-status-v4"><Check size={14} /> ¡Respuesta enviada!</div>}
         </div>
       )}
 
@@ -357,14 +357,14 @@ export const QuestionBlock: React.FC<QuestionBlockProps> = ({
         <div className="q-mediator-panel-v4">
           {isAdmin && (question.type === 'text' || question.type === 'paragraph') && question.correctAnswer && (
             <p className="admin-correct-ref-v4">
-              <strong>✓ Resposta de referência:</strong>{' '}
+              <strong>✓ Respuesta de referencia:</strong>{' '}
               {typeof question.correctAnswer === 'string'
                 ? question.correctAnswer
                 : (question.correctAnswer as string[]).join(' · ')}
             </p>
           )}
-          {question.mediator && <p><strong>💡 Mediação:</strong> {question.mediator}</p>}
-          {question.hint && <p className="hint"><strong>✨ Dica Aluna:</strong> {question.hint}</p>}
+          {question.mediator && <p><strong>💡 Mediación:</strong> {question.mediator}</p>}
+          {question.hint && <p className="hint"><strong>✨ Consejo para el alumno:</strong> {question.hint}</p>}
         </div>
       )}
     </div>

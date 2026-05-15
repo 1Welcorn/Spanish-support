@@ -41,17 +41,17 @@ const RichTextEditor: React.FC<{ value: string; onChange: (val: string) => void;
       <div className="rich-editor-toolbar" style={{ padding: '8px', borderBottom: '1px solid #e2e8f0', display: 'flex', flexWrap: 'wrap', gap: '6px', background: '#f8fafc' }}>
         <button onClick={() => exec('formatBlock', '<h1>')} style={btnStyle}>H1</button>
         <button onClick={() => exec('formatBlock', '<h2>')} style={btnStyle}>H2</button>
-        <button onClick={() => exec('bold')} style={btnStyle} title="Negrito"><Bold size={14} /></button>
-        <button onClick={() => exec('italic')} style={btnStyle} title="Itálico"><Italic size={14} /></button>
+        <button onClick={() => exec('bold')} style={btnStyle} title="Negrita"><Bold size={14} /></button>
+        <button onClick={() => exec('italic')} style={btnStyle} title="Cursiva"><Italic size={14} /></button>
         <div style={{ width: '1px', background: '#e2e8f0', margin: '0 4px' }} />
-        <button onClick={() => exec('justifyLeft')} style={btnStyle} title="Alinhar à Esquerda"><AlignLeft size={14} /></button>
-        <button onClick={() => exec('justifyCenter')} style={btnStyle} title="Centralizar"><AlignCenter size={14} /></button>
-        <button onClick={() => exec('justifyRight')} style={btnStyle} title="Alinhar à Direita"><AlignRight size={14} /></button>
+        <button onClick={() => exec('justifyLeft')} style={btnStyle} title="Alinear a la Izquierda"><AlignLeft size={14} /></button>
+        <button onClick={() => exec('justifyCenter')} style={btnStyle} title="Centrar"><AlignCenter size={14} /></button>
+        <button onClick={() => exec('justifyRight')} style={btnStyle} title="Alinear a la Derecha"><AlignRight size={14} /></button>
         <button onClick={() => exec('justifyFull')} style={btnStyle} title="Justificar"><AlignJustify size={14} /></button>
         <div style={{ width: '1px', background: '#e2e8f0', margin: '0 4px' }} />
         <button onClick={() => exec('insertUnorderedList')} style={btnStyle} title="Lista"><List size={14} /></button>
-        <button onClick={() => exec('foreColor', '#3b82f6')} style={{ ...btnStyle, color: '#3b82f6' }} title="Cor Azul"><Palette size={14} /></button>
-        <button onClick={() => exec('removeFormat')} style={{ ...btnStyle, color: '#ef4444' }} title="Limpar Formatação"><Eraser size={14} /></button>
+        <button onClick={() => exec('foreColor', '#3b82f6')} style={{ ...btnStyle, color: '#3b82f6' }} title="Color Azul"><Palette size={14} /></button>
+        <button onClick={() => exec('removeFormat')} style={{ ...btnStyle, color: '#ef4444' }} title="Limpiar Formato"><Eraser size={14} /></button>
       </div>
       <div 
         ref={editorRef} 
@@ -87,7 +87,7 @@ const AssetPicker: React.FC<{ onSelect: (path: string) => void; onClose: () => v
   <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
     <div style={{ background: 'white', borderRadius: '30px', padding: '30px', maxWidth: '600px', width: '100%', maxHeight: '80vh', overflowY: 'auto' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-        <h3 style={{ margin: 0, fontWeight: 900 }}>Galeria do Repositório</h3>
+        <h3 style={{ margin: 0, fontWeight: 900 }}>Galería del Repositorio</h3>
         <button onClick={onClose} style={{ background: 'none', border: 'none' }}><X /></button>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '15px' }}>
@@ -106,40 +106,40 @@ const AssetPicker: React.FC<{ onSelect: (path: string) => void; onClose: () => v
    item: any; 
    onChange: (updates: any) => void;
    label?: string;
- }> = ({ item, onChange, label = "CONFIGURAÇÕES DE APARÊNCIA" }) => (
+ }> = ({ item, onChange, label = "CONFIGURACIONES DE APARIENCIA" }) => (
    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
      <label style={{ fontSize: '11px', fontWeight: 900, color: '#64748b', letterSpacing: '1px' }}>{label}</label>
      <div style={{ background: '#f8fafc', padding: '15px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
          
-         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>LARGURA: {item.width || '100%'}</span></div>
+         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>ANCHO: {item.width || '100%'}</span></div>
          <input type="range" min="30" max="100" value={parseInt((item.width || '100%').replace(/[^0-9]/g, ''))} style={{ width: '100%' }} onChange={(e) => onChange({ width: `${e.target.value}%` })} />
          
          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>ALTURA: {item.height || 600}px</span></div>
          <input type="range" min="300" max="1200" step="10" value={item.height || 600} style={{ width: '100%' }} onChange={(e) => onChange({ height: parseInt(e.target.value) })} />
  
-         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>CANTOS DO FRAME: {item.borderRadius !== undefined ? item.borderRadius : 40}px</span></div>
+         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>BORDES DEL MARCO: {item.borderRadius !== undefined ? item.borderRadius : 40}px</span></div>
          <input type="range" min="0" max="100" step="1" value={item.borderRadius !== undefined ? item.borderRadius : 40} style={{ width: '100%' }} onChange={(e) => onChange({ borderRadius: parseInt(e.target.value) })} />
  
-         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>CANTOS DO PLAYER: {item.playerBorderRadius !== undefined ? item.playerBorderRadius : (item.borderRadius !== undefined ? item.borderRadius : 40)}px</span></div>
+         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>BORDES DEL REPRODUCTOR: {item.playerBorderRadius !== undefined ? item.playerBorderRadius : (item.borderRadius !== undefined ? item.borderRadius : 40)}px</span></div>
          <input type="range" min="0" max="100" step="1" value={item.playerBorderRadius !== undefined ? item.playerBorderRadius : (item.borderRadius !== undefined ? item.borderRadius : 40)} style={{ width: '100%' }} onChange={(e) => onChange({ playerBorderRadius: parseInt(e.target.value) })} />
  
-         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>ZOOM DA IMAGEM/VÍDEO: {item.scale || 1}x</span></div>
+         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>ZOOM DE LA IMAGEN/VIDEO: {item.scale || 1}x</span></div>
          <input type="range" min="0.5" max="3" step="0.1" value={item.scale || 1} style={{ width: '100%' }} onChange={(e) => onChange({ scale: parseFloat(e.target.value) })} />
  
-         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>ESPESSURA DO FRAME: {item.framePadding || '0px'}</span></div>
+         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>GROSOR DEL MARCO: {item.framePadding || '0px'}</span></div>
          <input type="range" min="0" max="60" step="1" value={parseInt(item.framePadding || '0')} style={{ width: '100%' }} onChange={(e) => onChange({ framePadding: `${e.target.value}px` })} />
  
-         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>COR DO FRAME:</span></div>
+         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>COLOR DEL MARCO:</span></div>
          <select value={item.frameColor || ''} style={{ fontSize: '11px', width: '100%', padding: '8px', borderRadius: '10px', border: '1px solid #e2e8f0' }} onChange={(e) => onChange({ frameColor: e.target.value })}>
-           <option value="">Padrão (Branco)</option>
+           <option value="">Predeterminado (Blanco)</option>
            <option value="transparent">Transparente</option>
-           <option value="white">Branco Puro</option>
-           <option value="#f8fafc">Cinza Azulado</option>
-           <option value="#fef3c7">Bege Pastel</option>
+           <option value="white">Blanco Puro</option>
+           <option value="#f8fafc">Gris Azulado</option>
+           <option value="#fef3c7">Beige Pastel</option>
            <option value="#3b82f6">Azul Vibrante</option>
            <option value="#10b981">Verde Dari</option>
-           <option value="#000000">Preto Profundo</option>
+           <option value="#000000">Negro Profundo</option>
          </select>
        </div>
      </div>
@@ -148,7 +148,7 @@ const AssetPicker: React.FC<{ onSelect: (path: string) => void; onClose: () => v
  
  const MiniActivityPreview: React.FC<{ item: any; unitColor: string }> = ({ item, unitColor }) => (
    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center', width: '100%' }}>
-     <span style={{ fontSize: '10px', fontWeight: 900, color: '#94a3b8' }}>LIVE SIMULATOR (VISTA DO ALUNO)</span>
+     <span style={{ fontSize: '10px', fontWeight: 900, color: '#94a3b8' }}>SIMULADOR EN VIVO (VISTA DEL ALUMNO)</span>
      <div style={{ 
        width: '100%', 
        background: '#f1f5f9', 
@@ -173,9 +173,9 @@ const AssetPicker: React.FC<{ onSelect: (path: string) => void; onClose: () => v
          height: 'fit-content'
        }}>
          <div style={{ flex: 1 }}>
-           <div style={{ fontSize: '8px', color: unitColor, fontWeight: 900 }}>ATIVIDADE</div>
+           <div style={{ fontSize: '8px', color: unitColor, fontWeight: 900 }}>ACTIVIDAD</div>
            <div style={{ fontSize: '10px', fontWeight: 900, marginTop: '2px' }} dangerouslySetInnerHTML={{ __html: item.title || 'Título' }} />
-           <div style={{ fontSize: '8px', color: '#64748b', marginTop: '4px' }}>Instruções pedagógicas aparecem aqui...</div>
+           <div style={{ fontSize: '8px', color: '#64748b', marginTop: '4px' }}>Instrucciones pedagógicas aparecen aquí...</div>
          </div>
          <div style={{ 
            width: '100px', 
@@ -198,7 +198,7 @@ const AssetPicker: React.FC<{ onSelect: (path: string) => void; onClose: () => v
  
  const MiniQuestionPreview: React.FC<{ item: any; unitColor: string }> = ({ item, unitColor }) => (
    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center', width: '100%' }}>
-     <span style={{ fontSize: '10px', fontWeight: 900, color: '#94a3b8' }}>LIVE SIMULATOR (VISTA DO ALUNO)</span>
+     <span style={{ fontSize: '10px', fontWeight: 900, color: '#94a3b8' }}>SIMULADOR EN VIVO (VISTA DEL ALUMNO)</span>
      <div style={{ 
        width: '100%', 
        background: '#f1f5f9', 
@@ -223,10 +223,10 @@ const AssetPicker: React.FC<{ onSelect: (path: string) => void; onClose: () => v
          minHeight: item.height ? `${item.height / 2.5}px` : '150px',
          height: 'fit-content'
        }}>
-         <div style={{ fontSize: '8px', color: '#7c3aed', fontWeight: 900 }}>QUESTÃO 1</div>
-         <div style={{ fontSize: '10px', fontWeight: 900 }} dangerouslySetInnerHTML={{ __html: item.q || 'Pergunta?' }} />
+         <div style={{ fontSize: '8px', color: '#7c3aed', fontWeight: 900 }}>PREGUNTA 1</div>
+         <div style={{ fontSize: '10px', fontWeight: 900 }} dangerouslySetInnerHTML={{ __html: item.q || '¿Pregunta?' }} />
          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            {(item.options || ['Opção 1']).map((o: any, idx: number) => (
+            {(item.options || ['Opción 1']).map((o: any, idx: number) => (
               <div key={idx} style={{ padding: '6px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '8px' }}>{o}</div>
             ))}
          </div>
@@ -340,7 +340,7 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
       if (err.message === 'Bucket not found') {
         alert('Erro no upload: O "bucket" chamado "media" não foi encontrado no seu Supabase.\n\nPara corrigir:\n1. Vá ao painel do Supabase -> Storage\n2. Crie um novo bucket chamado: media\n3. Marque como "Public bucket"');
       } else {
-        alert('Erro no upload: ' + (err.message || 'Erro desconhecido'));
+        alert('Error en la subida: ' + (err.message || 'Error desconocido'));
       }
     } finally {
       setLoading(false);
@@ -373,9 +373,9 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
         setAutoSavePulse(true);
         setTimeout(() => setAutoSavePulse(false), 2000);
       } else {
-         alert('Erro ao salvar: ' + result.error);
+         alert('Error al guardar: ' + result.error);
       }
-    } catch (err: any) { alert('Erro crítico ao salvar: ' + err.message); }
+    } catch (err: any) { alert('Error crítico al guardar: ' + err.message); }
   };
 
   const addWord = () => {
@@ -392,7 +392,7 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
     if (!tempEmbed.trim() || isSavingEmbed) return;
     setIsSavingEmbed(true);
     const normalized = normalizeEmbedUrl(tempEmbed);
-    const nextEmbeds = [...(unitData.embed_urls || []), { url: normalized, title: `Atividade`, width: '100%' }];
+    const nextEmbeds = [...(unitData.embed_urls || []), { url: normalized, title: `Actividad`, width: '100%' }];
     const nextData = { ...unitData, embed_urls: nextEmbeds };
     
     // Atualiza localmente e tenta salvar no banco imediatamente
@@ -416,14 +416,14 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <button onClick={onBack} style={{ background: '#f1f5f9', border: 'none', padding: '10px', borderRadius: '14px' }}><ChevronLeft size={24} /></button>
           <div>
-            <h1 style={{ fontSize: '18px', fontWeight: 900, margin: 0 }}>Gerenciador Maestro Full</h1>
-            <p style={{ fontSize: '12px', color: '#64748b', margin: 0 }}>Aula: {unitData.title}</p>
+            <h1 style={{ fontSize: '18px', fontWeight: 900, margin: 0 }}>Administrador Maestro Full</h1>
+            <p style={{ fontSize: '12px', color: '#64748b', margin: 0 }}>Clase: {unitData.title}</p>
           </div>
         </div>
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          {autoSavePulse && <span style={{ color: '#10b981', fontSize: '11px', fontWeight: 900, animation: 'pulse 1s infinite' }}>SALVO COM SUCESSO ✓</span>}
+          {autoSavePulse && <span style={{ color: '#10b981', fontSize: '11px', fontWeight: 900, animation: 'pulse 1s infinite' }}>GUARDADO CON ÉXITO ✓</span>}
           <button onClick={() => handleSave()} style={{ background: isDirty ? '#f59e0b' : '#10b981', color: 'white', border: 'none', padding: '12px 30px', borderRadius: '14px', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '10px', boxShadow: '0 10px 20px rgba(0,0,0,0.1)' }}>
-            <Save size={18} /> {isDirty ? 'GRAVAR TUDO AGORA' : 'SISTEMA EM DIA'}
+            <Save size={18} /> {isDirty ? 'GUARDAR TODO AHORA' : 'SISTEMA ACTUALIZADO'}
           </button>
         </div>
       </header>
@@ -434,15 +434,15 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
         <section style={{ background: 'white', borderRadius: '30px', padding: '30px', boxShadow: '0 10px 40px rgba(0,0,0,0.05)' }}>
            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
               <div style={{ background: '#6366f1', color: 'white', padding: '10px', borderRadius: '14px' }}><Type size={24} /></div>
-              <h3 style={{ margin: 0, fontWeight: 900 }}>Dados Gerais da Unidade</h3>
+              <h3 style={{ margin: 0, fontWeight: 900 }}>Datos Generales de la Unidad</h3>
            </div>
            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '30px' }}>
               <div>
-                <label style={{ fontSize: '11px', fontWeight: 900, color: '#64748b', display: 'block', marginBottom: '8px' }}>TÍTULO DA AULA (PRINCIPAL)</label>
+                <label style={{ fontSize: '11px', fontWeight: 900, color: '#64748b', display: 'block', marginBottom: '8px' }}>TÍTULO DE LA CLASE (PRINCIPAL)</label>
                 <RichTextEditor height="120px" value={unitData.title || ''} onChange={(val) => { setUnitData({...unitData, title: val}); setIsDirty(true); }} />
               </div>
               <div>
-                <label style={{ fontSize: '11px', fontWeight: 900, color: '#64748b', display: 'block', marginBottom: '8px' }}>SUBTÍTULO / DESCRIÇÃO RÁPIDA</label>
+                <label style={{ fontSize: '11px', fontWeight: 900, color: '#64748b', display: 'block', marginBottom: '8px' }}>SUBTÍTULO / DESCRIPCIÓN RÁPIDA</label>
                 <RichTextEditor height="120px" value={unitData.sub || ''} onChange={(val) => { setUnitData({...unitData, sub: val}); setIsDirty(true); }} />
               </div>
            </div>
@@ -452,60 +452,60 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
         <section style={{ background: 'white', borderRadius: '30px', padding: '30px', boxShadow: '0 10px 40px rgba(0,0,0,0.05)' }}>
            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
               <div style={{ background: '#3b82f6', color: 'white', padding: '10px', borderRadius: '14px' }}><BookOpen size={24} /></div>
-              <h3 style={{ margin: 0, fontWeight: 900 }}>1. Guia de Estudo & Mídias Maestro</h3>
+              <h3 style={{ margin: 0, fontWeight: 900 }}>1. Guía de Estudio y Medios Maestro</h3>
            </div>
            <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px 1fr', gap: '25px' }}>
               <div>
-                 <label style={{ fontSize: '11px', fontWeight: 900, color: '#64748b' }}>TEXTO DE INTRODUÇÃO</label>
+                 <label style={{ fontSize: '11px', fontWeight: 900, color: '#64748b' }}>TEXTO DE INTRODUCCIÓN</label>
                  <RichTextEditor value={unitData.brief || ""} onChange={(val) => { setUnitData({...unitData, brief: val}); setIsDirty(true); }} />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '500px', overflowY: 'auto', paddingRight: '10px' }}>
-                 <label style={{ fontSize: '11px', fontWeight: 900, color: '#64748b' }}>CONFIGURAÇÕES DE MÍDIA</label>
-                 <button onClick={() => { setUnitData({...unitData, external_links: [...(unitData.external_links || []), { label: 'video', url: '', width: '600px', height: 300, objectFit: 'cover' }]}); setIsDirty(true); }} style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '12px', borderRadius: '12px', fontWeight: 900 }}>+ ADICIONAR MÍDIA</button>
+                 <label style={{ fontSize: '11px', fontWeight: 900, color: '#64748b' }}>CONFIGURACIONES DE MEDIOS</label>
+                 <button onClick={() => { setUnitData({...unitData, external_links: [...(unitData.external_links || []), { label: 'video', url: '', width: '600px', height: 300, objectFit: 'cover' }]}); setIsDirty(true); }} style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '12px', borderRadius: '12px', fontWeight: 900 }}>+ AÑADIR MEDIOS</button>
                  
                   {(unitData.external_links || []).map((link: any, i: number) => (
                     <div key={i} style={{ background: '#f8fafc', padding: '15px', borderRadius: '20px', border: '1px solid #e2e8f0' }}>
                        <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
-                          <input type="text" value={link.url} placeholder="URL do Vídeo/Imagem..." style={{ flex: 1, padding: '10px', borderRadius: '10px' }} onChange={(e) => { const nl = [...unitData.external_links]; nl[i].url = e.target.value; setUnitData({...unitData, external_links: nl}); setIsDirty(true); }} />
-                          <button onClick={() => triggerUpload((url) => { const nl = [...unitData.external_links]; nl[i].url = url; setUnitData({...unitData, external_links: nl}); })} style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '8px' }} title="Upload Local"><ImageIcon size={16} /></button>
-                          <button onClick={() => setShowAssetPicker({ active: true, callback: (path) => { const nl = [...unitData.external_links]; nl[i].url = path; setUnitData({...unitData, external_links: nl}); setIsDirty(true); setShowAssetPicker({ active: false, callback: () => {} }); } })} style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '8px' }} title="Galeria do App"><Globe size={16} /></button>
+                          <input type="text" value={link.url} placeholder="URL del Video/Imagen..." style={{ flex: 1, padding: '10px', borderRadius: '10px' }} onChange={(e) => { const nl = [...unitData.external_links]; nl[i].url = e.target.value; setUnitData({...unitData, external_links: nl}); setIsDirty(true); }} />
+                          <button onClick={() => triggerUpload((url) => { const nl = [...unitData.external_links]; nl[i].url = url; setUnitData({...unitData, external_links: nl}); })} style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '8px' }} title="Subida Local"><ImageIcon size={16} /></button>
+                          <button onClick={() => setShowAssetPicker({ active: true, callback: (path) => { const nl = [...unitData.external_links]; nl[i].url = path; setUnitData({...unitData, external_links: nl}); setIsDirty(true); setShowAssetPicker({ active: false, callback: () => {} }); } })} style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '8px' }} title="Galería de la App"><Globe size={16} /></button>
                        </div>
                        
                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>LARGURA: {link.width || '600px'}</span></div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>ANCHO: {link.width || '600px'}</span></div>
                           <input type="range" min="200" max="1200" step="10" value={parseInt(String(link.width || '600').replace(/[^0-9]/g, '')) > 100 ? parseInt(String(link.width || '600').replace(/[^0-9]/g, '')) : 600} style={{ width: '100%' }} onChange={(e) => { const nl = [...unitData.external_links]; nl[i].width = `${e.target.value}px`; setUnitData({...unitData, external_links: nl}); setIsDirty(true); }} />
                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>ALTURA: {link.height || 300}px</span></div>
                           <input type="range" min="50" max="600" value={link.height || 300} style={{ width: '100%' }} onChange={(e) => { const nl = [...unitData.external_links]; nl[i].height = parseInt(e.target.value); setUnitData({...unitData, external_links: nl}); setIsDirty(true); }} />
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>CANTOS DO FRAME: {link.borderRadius !== undefined ? link.borderRadius : 20}px</span></div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>BORDES DEL MARCO: {link.borderRadius !== undefined ? link.borderRadius : 20}px</span></div>
                           <input type="range" min="0" max="100" step="1" value={link.borderRadius !== undefined ? link.borderRadius : 20} style={{ width: '100%' }} onChange={(e) => { const nl = [...unitData.external_links]; nl[i].borderRadius = parseInt(e.target.value); setUnitData({...unitData, external_links: nl}); setIsDirty(true); }} />
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>CANTOS DO PLAYER: {link.playerBorderRadius !== undefined ? link.playerBorderRadius : (link.borderRadius !== undefined ? link.borderRadius : 20)}px</span></div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>BORDES DEL REPRODUCTOR: {link.playerBorderRadius !== undefined ? link.playerBorderRadius : (link.borderRadius !== undefined ? link.borderRadius : 20)}px</span></div>
                           <input type="range" min="0" max="100" step="1" value={link.playerBorderRadius !== undefined ? link.playerBorderRadius : (link.borderRadius !== undefined ? link.borderRadius : 20)} style={{ width: '100%' }} onChange={(e) => { const nl = [...unitData.external_links]; nl[i].playerBorderRadius = parseInt(e.target.value); setUnitData({...unitData, external_links: nl}); setIsDirty(true); }} />
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>ZOOM DA IMAGEM/VÍDEO: {link.scale || 1}x</span></div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>ZOOM DE LA IMAGEN/VIDEO: {link.scale || 1}x</span></div>
                           <input type="range" min="0.5" max="3" step="0.1" value={link.scale || 1} style={{ width: '100%' }} onChange={(e) => { const nl = [...unitData.external_links]; nl[i].scale = parseFloat(e.target.value); setUnitData({...unitData, external_links: nl}); setIsDirty(true); }} />
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>ESPESSURA DO FRAME: {link.framePadding || '0px'}</span></div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>GROSOR DEL MARCO: {link.framePadding || '0px'}</span></div>
                           <input type="range" min="0" max="50" step="1" value={parseInt(link.framePadding || '0')} style={{ width: '100%' }} onChange={(e) => { const nl = [...unitData.external_links]; nl[i].framePadding = `${e.target.value}px`; setUnitData({...unitData, external_links: nl}); setIsDirty(true); }} />
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>COR DO FRAME:</span></div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>COLOR DEL MARCO:</span></div>
                           <select value={link.frameColor || ''} style={{ fontSize: '10px', width: '100%', padding: '5px', borderRadius: '5px', marginBottom: '5px' }} onChange={(e) => { const nl = [...unitData.external_links]; nl[i].frameColor = e.target.value; setUnitData({...unitData, external_links: nl}); setIsDirty(true); }}>
-                             <option value="">Padrão (Preto/Transp.)</option>
-                             <option value="transparent">Transparente (Vazio)</option>
-                             <option value="white">Branco</option>
-                             <option value="#fef3c7">Bege</option>
-                             <option value="#000000">Preto</option>
-                             <option value="#fbbf24">Amarelo</option>
+                             <option value="">Predeterminado (Negro/Transp.)</option>
+                             <option value="transparent">Transparente (Vacío)</option>
+                             <option value="white">Blanco</option>
+                             <option value="#fef3c7">Beige</option>
+                             <option value="#000000">Negro</option>
+                             <option value="#fbbf24">Amarillo</option>
                              <option value="#3b82f6">Azul</option>
                            </select>
-                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>DELAY DE INÍCIO: {link.delay || 0}s</span></div>
+                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 900 }}><span>RETRASO DE INICIO: {link.delay || 0}s</span></div>
                            <input type="range" min="0" max="15" step="0.5" value={link.delay || 0} style={{ width: '100%' }} onChange={(e) => { const nl = [...unitData.external_links]; nl[i].delay = parseFloat(e.target.value); setUnitData({...unitData, external_links: nl}); setIsDirty(true); }} />
                           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '5px' }}>                             <label style={{ fontSize: '10px', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', color: '#3b82f6' }}>
                                 <input type="checkbox" checked={!!link.autoPlayOnce} onChange={(e) => { const nl = [...unitData.external_links]; nl[i].autoPlayOnce = e.target.checked; setUnitData({...unitData, external_links: nl}); setIsDirty(true); }} /> AUTO-PLAY
                              </label>
                              <select value={link.objectFit || 'cover'} style={{ fontSize: '10px' }} onChange={(e) => { const nl = [...unitData.external_links]; nl[i].objectFit = e.target.value; setUnitData({...unitData, external_links: nl}); setIsDirty(true); }}>
                                 <option value="cover">Zoom</option>
-                                <option value="contain">Encaixar</option>
+                                <option value="contain">Ajustar</option>
                              </select>
                           </div>
                        </div>
-                       <button onClick={() => { const nl = unitData.external_links.filter((_: any, idx: number) => idx !== i); setUnitData({...unitData, external_links: nl}); setIsDirty(true); }} style={{ width: '100%', marginTop: '10px', color: '#ef4444', background: '#fee2e2', border: 'none', borderRadius: '8px', padding: '5px', fontSize: '10px', fontWeight: 900 }}>REMOVER</button>
+                       <button onClick={() => { const nl = unitData.external_links.filter((_: any, idx: number) => idx !== i); setUnitData({...unitData, external_links: nl}); setIsDirty(true); }} style={{ width: '100%', marginTop: '10px', color: '#ef4444', background: '#fee2e2', border: 'none', borderRadius: '8px', padding: '5px', fontSize: '10px', fontWeight: 900 }}>ELIMINAR</button>
                     </div>
                  ))}
               </div>
@@ -523,15 +523,15 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
         <section style={{ background: 'white', borderRadius: '30px', padding: '30px', boxShadow: '0 10px 40px rgba(0,0,0,0.05)' }}>
            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
               <div style={{ background: '#10b981', color: 'white', padding: '10px', borderRadius: '14px' }}><Globe size={24} /></div>
-              <h3 style={{ margin: 0, fontWeight: 900 }}>2. Atividades Interativas (Wordwall, Canva, etc.)</h3>
+              <h3 style={{ margin: 0, fontWeight: 900 }}>2. Actividades Interactivas (Wordwall, Canva, etc.)</h3>
            </div>
            <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', background: '#f8fafc', padding: '20px', borderRadius: '20px', border: '2px dashed #cbd5e1' }}>
               <div style={{ flex: 1 }}>
-                 <label style={{ fontSize: '10px', fontWeight: 900, color: '#64748b', marginBottom: '5px', display: 'block' }}>COLE O LINK DA ATIVIDADE AQUI</label>
-                 <input type="text" placeholder="Ex: https://wordwall.net/resource/..." value={tempEmbed} onChange={(e) => setTempEmbed(e.target.value)} style={{ width: '100%', padding: '15px', borderRadius: '15px', border: '1px solid #cbd5e1' }} />
+                 <label style={{ fontSize: '10px', fontWeight: 900, color: '#64748b', marginBottom: '5px', display: 'block' }}>PEGA EL ENLACE DE LA ACTIVIDAD AQUÍ</label>
+                 <input type="text" placeholder="Ej: https://wordwall.net/resource/..." value={tempEmbed} onChange={(e) => setTempEmbed(e.target.value)} style={{ width: '100%', padding: '15px', borderRadius: '15px', border: '1px solid #cbd5e1' }} />
               </div>
               <button onClick={saveEmbedLink} disabled={isSavingEmbed} style={{ alignSelf: 'flex-end', background: '#10b981', color: 'white', border: 'none', padding: '15px 30px', borderRadius: '15px', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '10px' }}>
-                 {isSavingEmbed ? 'Adicionando...' : <><Plus size={20} /> ADICIONAR E GRAVAR LINK</>}
+                 {isSavingEmbed ? 'Añadiendo...' : <><Plus size={20} /> + AÑADIR Y GUARDAR ENLACE</>}
               </button>
            </div>
            
@@ -545,9 +545,7 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
                    boxShadow: '0 20px 50px rgba(0,0,0,0.04)',
                    overflow: 'hidden',
                    display: 'flex',
-                   flexDirection: 'column'
-                 }}>
-                   {/* CARD HEADER */}
+                                     {/* CARD HEADER */}
                    <div style={{ background: '#f8fafc', padding: '20px 30px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <div style={{ background: '#10b981', color: 'white', padding: '8px', borderRadius: '12px' }}><Globe size={18} /></div>
@@ -555,14 +553,14 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
                            height="100px"
                            value={item.title || ''} 
                            onChange={(val) => { const nl = [...unitData.embed_urls]; nl[i].title = val; setUnitData({...unitData, embed_urls: nl}); setIsDirty(true); }} 
-                           placeholder="Título da Atividade..." 
+                           placeholder="Título de la Actividad..." 
                          />
                       </div>
                       <button 
-                        onClick={() => { if(window.confirm('Excluir esta atividade permanentemente?')) { const nl = unitData.embed_urls.filter((_: any, idx: number) => idx !== i); setUnitData({...unitData, embed_urls: nl}); setIsDirty(true); } }}
+                        onClick={() => { if(window.confirm('¿Eliminar esta actividad permanentemente?')) { const nl = unitData.embed_urls.filter((_: any, idx: number) => idx !== i); setUnitData({...unitData, embed_urls: nl}); setIsDirty(true); } }}
                         style={{ background: '#fee2e2', color: '#ef4444', border: 'none', padding: '10px 20px', borderRadius: '12px', fontWeight: 900, fontSize: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}
                       >
-                        <Trash2 size={16} /> EXCLUIR
+                        <Trash2 size={16} /> ELIMINAR
                       </button>
                    </div>
 
@@ -570,7 +568,7 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
                       {/* LEFT COLUMN: CONTENT & INSTRUCTIONS */}
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                         <div>
-                          <label style={{ fontSize: '11px', fontWeight: 900, color: '#94a3b8', display: 'block', marginBottom: '8px', letterSpacing: '1px' }}>LINK DA ATIVIDADE (URL)</label>
+                          <label style={{ fontSize: '11px', fontWeight: 900, color: '#94a3b8', display: 'block', marginBottom: '8px', letterSpacing: '1px' }}>ENLACE DE LA ACTIVIDAD (URL)</label>
                           <input 
                             type="text" 
                             value={item.url} 
@@ -580,31 +578,32 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
                         </div>
 
                         <div>
-                          <label style={{ fontSize: '11px', fontWeight: 900, color: '#94a3b8', display: 'block', marginBottom: '8px', letterSpacing: '1px' }}>INSTRUÇÕES PEDAGÓGICAS</label>
+                          <label style={{ fontSize: '11px', fontWeight: 900, color: '#94a3b8', display: 'block', marginBottom: '8px', letterSpacing: '1px' }}>INSTRUCCIONES PEDAGÓGICAS</label>
                           <RichTextEditor 
                             value={item.brief || ''} 
                             onChange={(val) => { const nl = [...unitData.embed_urls]; nl[i].brief = val; setUnitData({...unitData, embed_urls: nl}); setIsDirty(true); }} 
                             height="250px"
-                            placeholder="Dicas para o aluno..." 
+                            placeholder="Consejos para el alumno..." 
                           />
                           <div>
-                           <label style={{ fontSize: '11px', fontWeight: 900, color: '#94a3b8', display: 'block', marginBottom: '8px', letterSpacing: '1px' }}>CONFIGURAÇÃO DE MISTÉRIO</label>
+                           <label style={{ fontSize: '11px', fontWeight: 900, color: '#94a3b8', display: 'block', marginBottom: '8px', letterSpacing: '1px' }}>CONFIGURACIÓN DE MISTERIO</label>
                            <div style={{ background: '#f8fafc', padding: '15px', borderRadius: '20px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '15px' }}>
                              <div>
-                               <label style={{ fontSize: '10px', fontWeight: 900, color: '#64748b', display: 'block', marginBottom: '4px' }}>IMAGEM DA MÁSCARA (URL)</label>
+                               <label style={{ fontSize: '10px', fontWeight: 900, color: '#64748b', display: 'block', marginBottom: '4px' }}>IMAGEN DE LA MÁSCARA (URL)</label>
                                <div style={{ display: 'flex', gap: '8px' }}>
-                                 <input type="text" value={item.mystery_icon || ''} onChange={(e) => { const nl = [...unitData.embed_urls]; nl[i].mystery_icon = e.target.value; setUnitData({...unitData, embed_urls: nl}); setIsDirty(true); }} placeholder="Link ou escolha na galeria..." style={{ flex: 1, padding: '10px', borderRadius: '10px', border: '1.5px solid #e2e8f0', fontSize: '12px' }} />
-                                 <button onClick={() => triggerUpload((url) => { const nl = [...unitData.embed_urls]; nl[i].mystery_icon = url; setUnitData({...unitData, embed_urls: nl}); })} style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '8px' }} title="Upload Local"><ImageIcon size={16} /></button>
-                                 <button onClick={() => setShowAssetPicker({ active: true, callback: (path) => { const nl = [...unitData.embed_urls]; nl[i].mystery_icon = path; setUnitData({...unitData, embed_urls: nl}); setIsDirty(true); setShowAssetPicker({ active: false, callback: () => {} }); } })} style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '8px' }} title="Galeria"><Globe size={16} /></button>
+                                 <input type="text" value={item.mystery_icon || ''} onChange={(e) => { const nl = [...unitData.embed_urls]; nl[i].mystery_icon = e.target.value; setUnitData({...unitData, embed_urls: nl}); setIsDirty(true); }} placeholder="Enlace o elige en la galería..." style={{ flex: 1, padding: '10px', borderRadius: '10px', border: '1.5px solid #e2e8f0', fontSize: '12px' }} />
+                                 <button onClick={() => triggerUpload((url) => { const nl = [...unitData.embed_urls]; nl[i].mystery_icon = url; setUnitData({...unitData, embed_urls: nl}); })} style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '8px' }} title="Subida Local"><ImageIcon size={16} /></button>
+                                 <button onClick={() => setShowAssetPicker({ active: true, callback: (path) => { const nl = [...unitData.embed_urls]; nl[i].mystery_icon = path; setUnitData({...unitData, embed_urls: nl}); setIsDirty(true); setShowAssetPicker({ active: false, callback: () => {} }); } })} style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '8px' }} title="Galería"><Globe size={16} /></button>
                                </div>
                              </div>
                              
                              <div>
-                               <label style={{ fontSize: '10px', fontWeight: 900, color: '#64748b', display: 'block', marginBottom: '4px' }}>TAMANHO DO ÍCONE: {item.mystery_icon_size || 120}px</label>
+                               <label style={{ fontSize: '10px', fontWeight: 900, color: '#64748b', display: 'block', marginBottom: '4px' }}>TAMAÑO DEL ÍCONO: {item.mystery_icon_size || 120}px</label>
                                <input type="range" min="40" max="300" value={item.mystery_icon_size || 120} onChange={(e) => { const nl = [...unitData.embed_urls]; nl[i].mystery_icon_size = parseInt(e.target.value); setUnitData({...unitData, embed_urls: nl}); setIsDirty(true); }} style={{ width: '100%' }} />
                              </div>
                            </div>
                          </div>
+                        </div>                    </div>
                         </div>
                       </div>
 
@@ -629,9 +628,9 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
         <section style={{ background: 'white', borderRadius: '30px', padding: '30px', boxShadow: '0 10px 40px rgba(0,0,0,0.05)' }}>
            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
               <div style={{ background: '#8b5cf6', color: 'white', padding: '10px', borderRadius: '14px' }}><Zap size={24} /></div>
-              <h3 style={{ margin: 0, fontWeight: 900 }}>3. Questões Interativas (Estilo Forms)</h3>
+              <h3 style={{ margin: 0, fontWeight: 900 }}>3. Preguntas Interactivas (Estilo Forms)</h3>
            </div>
-           <button onClick={() => { setUnitData({...unitData, questions: [...(unitData.questions || []), { title: 'Nova Pergunta', type: 'choice', options: ['Opção 1'], correct: 'Opção 1' }]}); setIsDirty(true); }} style={{ background: '#8b5cf6', color: 'white', border: 'none', padding: '12px 25px', borderRadius: '15px', fontWeight: 900, marginBottom: '20px' }}>+ CRIAR NOVA QUESTÃO</button>
+           <button onClick={() => { setUnitData({...unitData, questions: [...(unitData.questions || []), { title: 'Nueva Pregunta', type: 'choice', options: ['Opción 1'], correct: 'Opción 1' }]}); setIsDirty(true); }} style={{ background: '#8b5cf6', color: 'white', border: 'none', padding: '12px 25px', borderRadius: '15px', fontWeight: 900, marginBottom: '20px' }}>+ CREAR NUEVA PREGUNTA</button>
            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                {unitData.questions?.map((q: any, i: number) => (
                  <div key={i} style={{ background: '#f8fafc', padding: '25px', borderRadius: '25px', border: '1px solid #e2e8f0' }}>
@@ -644,7 +643,7 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
                     
                     <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr 1.2fr', gap: '30px', marginTop: '20px' }}>
                        <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                          <label style={{ fontSize: '11px', fontWeight: 900, color: '#94a3b8' }}>OPÇÕES DE RESPOSTA</label>
+                          <label style={{ fontSize: '11px', fontWeight: 900, color: '#94a3b8' }}>OPCIONES DE RESPUESTA</label>
                           {q.options?.map((opt: string, oIdx: number) => (
                             <div key={oIdx} style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                                <input type="radio" checked={q.correct === opt} onChange={() => { const nq = [...unitData.questions]; nq[i].correct = opt; setUnitData({...unitData, questions: nq}); setIsDirty(true); }} />
@@ -652,7 +651,7 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
                                <button onClick={() => { const nq = [...unitData.questions]; nq[i].options = nq[i].options.filter((_: any, idx: number) => idx !== oIdx); setUnitData({...unitData, questions: nq}); setIsDirty(true); }} style={{ background: 'none', border: 'none', color: '#ef4444' }}><X size={16} /></button>
                             </div>
                           ))}
-                          <button onClick={() => { const nq = [...unitData.questions]; nq[i].options = [...(nq[i].options || []), 'Nova Opção']; setUnitData({...unitData, questions: nq}); setIsDirty(true); }} style={{ color: '#8b5cf6', fontWeight: 800, fontSize: '13px', textAlign: 'left', marginTop: '10px', background: 'none', border: 'none' }}>+ ADICIONAR OPÇÃO</button>
+                          <button onClick={() => { const nq = [...unitData.questions]; nq[i].options = [...(nq[i].options || []), 'Nueva Opción']; setUnitData({...unitData, questions: nq}); setIsDirty(true); }} style={{ color: '#8b5cf6', fontWeight: 800, fontSize: '13px', textAlign: 'left', marginTop: '10px', background: 'none', border: 'none' }}>+ AÑADIR OPCIÓN</button>
                        </div>
                        
                        <StylingControls 
@@ -675,11 +674,11 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
         {/* SECTION 4: BNCC & TEMA */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
            <section style={{ background: 'white', borderRadius: '30px', padding: '30px', boxShadow: '0 10px 40px rgba(0,0,0,0.05)' }}>
-              <h3 style={{ margin: 0, fontWeight: 900, marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '10px' }}><Target color="#f59e0b" /> Descritores BNCC</h3>
+              <h3 style={{ margin: 0, fontWeight: 900, marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '10px' }}><Target color="#f59e0b" /> Descriptores</h3>
               <input value={descText} onChange={(e) => { setDescText(e.target.value); setIsDirty(true); }} placeholder="D3, D5, EF06LI01..." style={{ width: '100%', padding: '15px', borderRadius: '15px', border: '1px solid #cbd5e1' }} />
            </section>
            <section style={{ background: 'white', borderRadius: '30px', padding: '30px', boxShadow: '0 10px 40px rgba(0,0,0,0.05)' }}>
-              <h3 style={{ margin: 0, fontWeight: 900, marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '10px' }}><Palette color="#ec4899" /> Tema da Unidade</h3>
+              <h3 style={{ margin: 0, fontWeight: 900, marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '10px' }}><Palette color="#ec4899" /> Tema de la Unidad</h3>
               <div style={{ display: 'flex', gap: '15px' }}>
                  {['gamer', 'creative', 'pop', 'natural'].map(t => (
                     <button key={t} onClick={() => { setUnitData({...unitData, color: t}); setIsDirty(true); }} style={{ 
@@ -697,11 +696,11 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
         <section style={{ background: 'white', borderRadius: '30px', padding: '30px', boxShadow: '0 10px 40px rgba(0,0,0,0.05)' }}>
            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
               <div style={{ background: '#f59e0b', color: 'white', padding: '10px', borderRadius: '14px' }}><Sparkles size={24} /></div>
-              <h3 style={{ margin: 0, fontWeight: 900 }}>4. Visual & Gamificação (Ícones e Skins)</h3>
+              <h3 style={{ margin: 0, fontWeight: 900 }}>4. Visual y Gamificación (Íconos y Skins)</h3>
            </div>
            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
               <div>
-                 <label style={{ fontSize: '11px', fontWeight: 900, color: '#64748b', display: 'block', marginBottom: '10px' }}>ÍCONE 3D DA AULA</label>
+                 <label style={{ fontSize: '11px', fontWeight: 900, color: '#64748b', display: 'block', marginBottom: '10px' }}>ÍCONO 3D DE LA CLASE</label>
                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px' }}>
                     {[
                       { id: 'chef', icon: <ChefHat /> },
@@ -730,17 +729,17 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
                  </div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                 <label style={{ fontSize: '11px', fontWeight: 900, color: '#64748b' }}>ÍCONE MISTERIOSO (MÁSCARA)</label>
+                 <label style={{ fontSize: '11px', fontWeight: 900, color: '#64748b' }}>ÍCONO MISTERIOSO (MÁSCARA)</label>
                  <input 
                    type="text" 
                    value={unitData.mystery_icon || ""} 
                    onChange={(e) => { setUnitData({...unitData, mystery_icon: e.target.value}); setIsDirty(true); }}
-                   placeholder="Link da imagem (Ex: Interrogação, Baú...)"
+                   placeholder="Enlace de la imagen (Ej: Interrogación, Cofre...)"
                    style={{ width: '100%', padding: '15px', borderRadius: '15px', border: '1px solid #cbd5e1' }}
                  />
                  
                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                   <label style={{ fontSize: '11px', fontWeight: 900, color: '#64748b', whiteSpace: 'nowrap' }}>TAMANHO: {unitData.mystery_icon_size || 120}px</label>
+                   <label style={{ fontSize: '11px', fontWeight: 900, color: '#64748b', whiteSpace: 'nowrap' }}>TAMAÑO: {unitData.mystery_icon_size || 120}px</label>
                    <input 
                      type="range" 
                      min="40" 
@@ -763,7 +762,7 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
                         }} 
                       />
                     ) : (
-                      <span style={{ fontSize: '11px', color: '#94a3b8' }}>Sem máscara ativa (usará padrão)</span>
+                      <span style={{ fontSize: '11px', color: '#94a3b8' }}>Sin máscara activa (usará predeterminado)</span>
                     )}
                  </div>
               </div>
@@ -772,10 +771,10 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
 
         {/* SECTION 5: BANCO DE PALAVRAS (WORD FALL) */}
         <section style={{ background: 'white', borderRadius: '30px', padding: '30px', boxShadow: '0 10px 40px rgba(0,0,0,0.05)' }}>
-           <h3 style={{ margin: 0, fontWeight: 900, marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '10px' }}><Zap color="#10b981" /> Banco de Palavras (Jogo WordFall)</h3>
+           <h3 style={{ margin: 0, fontWeight: 900, marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '10px' }}><Zap color="#10b981" /> Banco de Palabras (Juego WordFall)</h3>
            <div style={{ display: 'flex', gap: '10px' }}>
-              <input value={newWord} onChange={(e) => setNewWord(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && addWord()} placeholder="Ex: Fridge / Geladeira" style={{ flex: 1, padding: '15px', borderRadius: '15px', border: '1px solid #cbd5e1' }} />
-              <button onClick={addWord} style={{ background: '#10b981', color: 'white', border: 'none', padding: '0 25px', borderRadius: '15px', fontWeight: 900 }}>ADICIONAR À LISTA</button>
+              <input value={newWord} onChange={(e) => setNewWord(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && addWord()} placeholder="Ej: Fridge / Nevera" style={{ flex: 1, padding: '15px', borderRadius: '15px', border: '1px solid #cbd5e1' }} />
+              <button onClick={addWord} style={{ background: '#10b981', color: 'white', border: 'none', padding: '0 25px', borderRadius: '15px', fontWeight: 900 }}>AÑADIR A LA LISTA</button>
            </div>
            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '20px' }}>
               {unitData.vocabulary_list?.map((w: any, i: number) => (

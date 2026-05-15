@@ -36,7 +36,7 @@ export const WhatsAppAssistant: React.FC<WhatsAppAssistantProps> = ({ units, med
   return (
     <div className="screen">
       <p style={{ fontSize: '13px', color: 'var(--ink3)', marginBottom: '16px', lineHeight: '1.6' }}>
-        Edite, copie e envie as instruções pré-formatadas para o mediador antes de cada sessão.
+        Edita, copia y envía las instrucciones preformateadas para el mediador antes de cada sesión.
       </p>
 
       {units.map((unit) => (
@@ -47,7 +47,7 @@ export const WhatsAppAssistant: React.FC<WhatsAppAssistantProps> = ({ units, med
                 className="wa-msg-textarea"
                 value={editedMsgs[unit.id]}
                 onChange={(e) => handleMsgChange(unit.id, e.target.value)}
-                placeholder="Digite a mensagem para o WhatsApp..."
+                placeholder="Escribe el mensaje para WhatsApp..."
              />
           </div>
           <div className="wa-actions">
@@ -55,13 +55,13 @@ export const WhatsAppAssistant: React.FC<WhatsAppAssistantProps> = ({ units, med
               className={`copy-wa-btn ${copiedId === unit.id ? 'ok' : ''}`}
               onClick={() => handleCopy(unit.id)}
             >
-              {copiedId === unit.id ? <><Check size={14} /> Copiado!</> : <><Copy size={14} /> Copiar Texto</>}
+              {copiedId === unit.id ? <><Check size={14} /> ¡Copiado!</> : <><Copy size={14} /> Copiar Texto</>}
             </button>
             <button 
               className="copy-wa-btn zap-btn" 
               onClick={() => handleOpenWhatsApp(unit.id)}
             >
-              <ExternalLink size={14} /> Abrir no Zap
+              <ExternalLink size={14} /> Abrir en WhatsApp
             </button>
           </div>
         </div>

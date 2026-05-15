@@ -45,10 +45,10 @@ const WordFallGame: React.FC<WordFallGameProps> = ({ onBack }) => {
           }}
         >
           <ArrowLeft size={18} />
-          Voltar ao Painel
+          Volver al Panel
         </button>
         <div style={{ marginLeft: '20px', fontWeight: 800, color: '#1e293b' }}>
-          WordFall Game (Versão Online)
+          WordFall Game (Versión Online)
         </div>
       </div>
 

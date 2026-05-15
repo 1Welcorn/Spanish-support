@@ -150,7 +150,7 @@ export const useDariData = () => {
         return false;
       } else {
         setSyncStatus('ok');
-        // Atualiza estado local removendo as chaves dessa unidade
+        // Actualiza estado local eliminando las claves de esta unidad
         setAnswers(prev => {
           const next = { ...prev };
           Object.keys(next).forEach(key => {
@@ -210,16 +210,16 @@ export const useDariData = () => {
       const newId = `u${Date.now()}`;
       const newUnit: Unit = {
         id: newId,
-        title: title || 'Nova Unidade',
-        sub: 'Nova aula · 10 min',
-        color: 'teal',
+        title: title || 'Nueva Unidad',
+        sub: 'Nueva clase · 10 min',
+        color: 'emerald',
         sort_order: units.length,
-        brief: 'Diretrizes para mediação pedagógica focada no desenvolvimento da autonomia e competência linguística...',
-        plan_c: 'Língua Inglesa: Estudo do léxico, estruturas gramaticais em contextos significativos e práticas de multiletramentos.',
-        plan_h: 'Mobilizar conhecimentos prévios para a compreensão de textos orais e escritos, desenvolvendo estratégias de leitura e produção textual adaptadas ao contexto domiciliar.',
-        plan_e: 'Metodologias ativas com suporte de TIC (Tecnologias de Informação e Comunicação), mediação individualizada, recursos gamificados (Wordwall) e vídeos instrucionais.',
-        plan_a: 'Formativa e contínua: registros em diário de classe, observação do engajamento nas plataformas interativas e evolução na resolução de problemas linguísticos.',
-        wa: 'Olá! Vamos iniciar uma nova jornada de aprendizado hoje...',
+        brief: 'Directrices para mediación pedagógica enfocada en el desarrollo de la autonomía y competencia lingüística...',
+        plan_c: 'Lengua Inglesa: Estudio del léxico, estructuras gramaticales en contextos significativos y prácticas de multialfabetización.',
+        plan_h: 'Movilizar conocimientos previos para la comprensión de textos orales y escritos, desarrollando estrategias de lectura y producción textual adaptadas al contexto domiciliario.',
+        plan_e: 'Metodologías activas con soporte de TIC (Tecnologías de Información y Comunicación), mediación individualizada, recursos gamificados (Wordwall) y videos instruccionales.',
+        plan_a: 'Formativa y continua: registros en diario de clase, observación del compromiso en las plataformas interactivas y evolución en la resolución de problemas lingüísticos.',
+        wa: '¡Hola! Vamos a iniciar una nueva jornada de aprendizaje hoy...',
         embed_urls: [],
         descriptors: [],
         questions: [],

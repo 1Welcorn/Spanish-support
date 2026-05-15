@@ -152,7 +152,7 @@ export const App: React.FC = () => {
       <div id="loader">
         <img src={tulipIcon} alt="Logo" style={{ width: '440px', height: 'auto', marginBottom: '40px' }} />
         <div className="loader-spinner"></div>
-        <div className="loader-msg">Carregando o sistema...</div>
+        <div className="loader-msg">Cargando el sistema...</div>
       </div>
     );
   }
@@ -166,13 +166,13 @@ export const App: React.FC = () => {
     return (
       <div style={{ padding: '40px 20px', textAlign: 'center', background: 'var(--bg)', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
         <img src={tulipIcon} alt="Logo" style={{ width: '400px', height: 'auto', marginBottom: '40px' }} />
-        <h3 style={{ color: 'var(--ink2)', marginBottom: '10px', fontSize: '24px' }}>Nenhuma Aula Encontrada</h3>
+        <h3 style={{ color: 'var(--ink2)', marginBottom: '10px', fontSize: '24px' }}>No se encontraron clases</h3>
         <p style={{ color: 'var(--ink4)', maxWidth: '400px', margin: '0 auto 24px' }}>
-          As unidades de ensino não foram carregadas. Isso geralmente acontece se as permissões (RLS) no Supabase não foram atualizadas para o seu e-mail.
+          Las unidades de enseñanza no se han cargado.
         </p>
         <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-          <button className="primary-btn" onClick={() => window.location.reload()} style={{ padding: '10px 20px' }}>Tentar Novamente</button>
-          {role === 'admin' && <button className="secondary-btn" onClick={() => setActiveTab('planning')} style={{ padding: '10px 20px' }}>Ir para Planejamento</button>}
+          <button className="primary-btn" onClick={() => window.location.reload()} style={{ padding: '10px 20px' }}>Reintentar</button>
+          {role === 'admin' && <button className="secondary-btn" onClick={() => setActiveTab('planning')} style={{ padding: '10px 20px' }}>Ir a Planificación</button>}
         </div>
       </div>
     );
@@ -183,14 +183,14 @@ export const App: React.FC = () => {
 
       <div className="topbar">
         <div>
-          <div className="topbar-logo">Projeto Pontes da Esperança · 2026</div>
-          <div className="topbar-name" style={{ direction: 'rtl', textAlign: 'left' }}>
-            {user?.user_metadata?.full_name || 'دانش‌آmuz (Estudante)'}
+          <div className="topbar-logo">Proyecto Puentes de Esperanza · 2026</div>
+          <div className="topbar-name" style={{ textAlign: 'left' }}>
+            {user?.user_metadata?.full_name || 'Estudiante'}
           </div>
         </div>
         <div style={{ textAlign: 'right' }}>
           <span style={{ fontSize: '11px', color: 'var(--ink4)' }}>
-            {role === 'student' ? (user?.user_metadata?.full_name || 'Estudante') : (settings?.med_name || 'Professor(a)')}
+            {role === 'student' ? (user?.user_metadata?.full_name || 'Estudiante') : (settings?.med_name || 'Profesor(a)')}
           </span>
         </div>
       </div>
@@ -224,14 +224,14 @@ export const App: React.FC = () => {
               textTransform: 'uppercase',
               letterSpacing: '0.5px'
             }}>
-              Modo de Visualização
+              Modo de Visualización
             </span>
             <span style={{
               fontSize: '13px',
               fontWeight: 800,
               color: isPreviewMode ? 'white' : '#1e293b'
             }}>
-              {isPreviewMode ? 'Estudante' : 'Administrador'}
+              {isPreviewMode ? 'Estudiante' : 'Administrador'}
             </span>
           </div>
 
@@ -257,9 +257,9 @@ export const App: React.FC = () => {
             }}
           >
             {isPreviewMode ? (
-              <><span>🔓</span> SAIR DO PREVIEW</>
+              <><span>🔓</span> SALIR DEL PREVIEW</>
             ) : (
-              <><span>👁️</span> VER COMO ALUNO</>
+              <><span>👁️</span> VER COMO ALUMNO</>
             )}
           </button>
         </div>
@@ -275,8 +275,7 @@ export const App: React.FC = () => {
           style={{ justifyContent: 'center', textAlign: 'center' }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <span style={{ direction: 'rtl', fontSize: '22px', fontWeight: 900, lineHeight: 1 }}>صنف‌های من</span>
-            <span style={{ fontSize: '14px', fontWeight: 700, opacity: 0.9, marginTop: '4px' }}>Minhas Aulas</span>
+            <span style={{ fontSize: '22px', fontWeight: 900, lineHeight: 1 }}>Mis Clases</span>
           </div>
         </button>
 
@@ -287,7 +286,7 @@ export const App: React.FC = () => {
             style={{ justifyContent: 'center', textAlign: 'center' }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <span style={{ fontSize: '18px', fontWeight: 900 }}>Planejamento</span>
+              <span style={{ fontSize: '18px', fontWeight: 900 }}>Planificación</span>
             </div>
           </button>
         )}
@@ -298,8 +297,7 @@ export const App: React.FC = () => {
           style={{ justifyContent: 'center', textAlign: 'center' }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <span style={{ direction: 'rtl', fontSize: '22px', fontWeight: 900, lineHeight: 1 }}>کمک</span>
-            <span style={{ fontSize: '14px', fontWeight: 700, opacity: 0.9, marginTop: '4px' }}>Ajuda (Help)</span>
+            <span style={{ fontSize: '22px', fontWeight: 900, lineHeight: 1 }}>Ayuda</span>
           </div>
         </button>
 
@@ -310,8 +308,7 @@ export const App: React.FC = () => {
              style={{ justifyContent: 'center', textAlign: 'center' }}
            >
              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-               <span style={{ direction: 'rtl', fontSize: '18px', fontWeight: 900, lineHeight: 1 }}>خروج</span>
-               <span style={{ fontSize: '12px', fontWeight: 700, opacity: 0.9, marginTop: '4px' }}>Sair (Logout)</span>
+               <span style={{ fontSize: '18px', fontWeight: 900, lineHeight: 1 }}>Salir</span>
              </div>
            </button>
         </div>
@@ -358,7 +355,7 @@ export const App: React.FC = () => {
                 <>
                   <div className="back-row">
                     <button className="back-btn" onClick={() => setActiveTab('adventure')}>←</button>
-                    <h2 className="screen-title" style={{ margin: 0 }}>Planejamento</h2>
+                    <h2 className="screen-title" style={{ margin: 0 }}>Planificación</h2>
                   </div>
                   <Planning
                     units={units}
@@ -401,7 +398,7 @@ export const App: React.FC = () => {
             <div>
               <div className="back-row">
                 <button className="back-btn" onClick={() => setActiveTab('adventure')}>←</button>
-                <h2 className="screen-title" style={{ margin: 0 }}>WhatsApp assistant</h2>
+                <h2 className="screen-title" style={{ margin: 0 }}>Asistente de Ayuda</h2>
               </div>
               <WhatsAppAssistant
                 units={units}
@@ -413,15 +410,15 @@ export const App: React.FC = () => {
             <div>
               <div className="back-row">
                 <button className="back-btn" onClick={() => setActiveTab('adventure')}>←</button>
-                <h2 className="screen-title" style={{ margin: 0 }}>Configurações</h2>
+                <h2 className="screen-title" style={{ margin: 0 }}>Configuraciones</h2>
               </div>
               <div className="settings-section">
                 <div className="settings-row">
-                  <div className="settings-row-label">E-mail logado</div>
-                  <div className="settings-row-sub">{role === 'admin' ? 'Administrador' : 'Mediador'}</div>
+                  <div className="settings-row-label">E-mail conectado</div>
+                  <div className="settings-row-sub">{role === 'admin' ? 'Administrador' : 'Profesor'}</div>
                 </div>
               </div>
-              <button className="logout-btn" onClick={logout}>Sair / Trocar perfil</button>
+              <button className="logout-btn" onClick={logout}>Salir / Cambiar perfil</button>
             </div>
           )}
         </main>
@@ -431,8 +428,8 @@ export const App: React.FC = () => {
         <div className="celebration-overlay">
           <div className="celebration-card">
             <span className="cel-trophy">🏆</span>
-            <h2 className="cel-title">INCRÍVEL!</h2>
-            <p className="cel-sub">Você completou o desafio com sucesso!</p>
+            <h2 className="cel-title">¡INCREÍBLE!</h2>
+            <p className="cel-sub">¡Has completado el desafío con éxito!</p>
 
             <div className="cel-rewards">
               <div className="cel-reward-item">
@@ -441,12 +438,12 @@ export const App: React.FC = () => {
               </div>
               <div className="cel-reward-item">
                 <span className="cel-reward-val">+{celebration.stars}</span>
-                <span className="cel-reward-lbl">Estrelas</span>
+                <span className="cel-reward-lbl">Estrellas</span>
               </div>
             </div>
 
             <button className="cel-btn" onClick={() => setCelebration(null)}>
-              CONTINUAR JORNADA
+              CONTINUAR VIAJE
             </button>
           </div>
         </div>

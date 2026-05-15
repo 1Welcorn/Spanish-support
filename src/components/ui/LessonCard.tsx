@@ -84,7 +84,7 @@ export const LessonCard: React.FC<LessonCardProps & { isAdmin?: boolean, onToggl
       >
         {isCompleted && (
           <div className="lesson-ribbon-v5" style={{ background: 'var(--sage)', color: 'white', fontSize: '8px' }}>
-            تکمیل شد!
+            ¡Completado!
           </div>
         )}
 
@@ -122,7 +122,7 @@ export const LessonCard: React.FC<LessonCardProps & { isAdmin?: boolean, onToggl
             boxShadow: '0 4px 10px rgba(216, 180, 216, 0.4)',
             whiteSpace: 'nowrap'
           }}>
-            {lesson.sub || `AULA ${idx + 1}`}
+            {lesson.sub || `CLASE ${idx + 1}`}
           </span>
         </div>
         
@@ -139,7 +139,6 @@ export const LessonCard: React.FC<LessonCardProps & { isAdmin?: boolean, onToggl
           </h3>
           {lesson.titleDari && (
             <div style={{ 
-              direction: 'rtl', 
               fontSize: '18px', 
               fontWeight: 900, 
               color: 'var(--ink1)',
@@ -183,8 +182,8 @@ export const LessonCard: React.FC<LessonCardProps & { isAdmin?: boolean, onToggl
             minHeight: 'auto',
             borderWidth: '2px'
           }}>
-            <span style={{ fontSize: '12px', fontWeight: 900, lineHeight: 1 }}>حالا شروع کنید!</span>
-            <span style={{ fontSize: '8px', fontWeight: 700, opacity: 0.9 }}>(Começar Agora!)</span>
+            <span style={{ fontSize: '12px', fontWeight: 900, lineHeight: 1 }}>¡Empezar Ahora!</span>
+            <span style={{ fontSize: '8px', fontWeight: 700, opacity: 0.9 }}>(Start Now!)</span>
           </button>
         )}
       </motion.div>
@@ -212,7 +211,7 @@ export const LessonCard: React.FC<LessonCardProps & { isAdmin?: boolean, onToggl
             boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
             zIndex: 10
           }}
-          title={isLocked ? "Desbloquear Unidade" : "Bloquear Unidade"}
+          title={isLocked ? "Desbloquear Unidad" : "Bloquear Unidad"}
         >
           {isLocked ? <Lock size={14} /> : <Unlock size={14} />}
         </button>

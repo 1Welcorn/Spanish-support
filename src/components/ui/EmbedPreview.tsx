@@ -64,7 +64,7 @@ const EmbedPreview = React.forwardRef<EmbedPreviewHandle, { url: string; title?:
       </button>
       <iframe
         src={url}
-        title={title || 'Atividade interativa'}
+        title={title || 'Actividad interactiva'}
         allow="fullscreen; autoplay; clipboard-read; clipboard-write"
         allowFullScreen
         className="game-iframe-v6"
@@ -94,7 +94,7 @@ const EmbedPreview = React.forwardRef<EmbedPreviewHandle, { url: string; title?:
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
                     <Sparkles size={maskSize || 80} color="#fbbf24" fill="#fbbf24" />
-                    <span style={{ fontSize: '14px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '2px' }}>Conteúdo Misterioso</span>
+                    <span style={{ fontSize: '14px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '2px' }}>Contenido Misterioso</span>
                   </div>
                 )}
               </div>
