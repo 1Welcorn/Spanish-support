@@ -1,7 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { UserRole } from '../types';
-import { auth } from '../services/firebase';
+export type ProjectMode = 'afghan' | 'spanish';
+import { auth, db } from '../services/firebase';
 import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import type { User } from 'firebase/auth';
 
 export interface AppUser {
@@ -25,6 +27,8 @@ interface AuthContextType {
   signInWithName: (name: string, pin: string) => Promise<boolean>;
   loginWithRole: (role: UserRole) => void;
   logout: () => Promise<void>;
+  projectMode: ProjectMode | null;
+  setProjectMode: (mode: ProjectMode) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -43,12 +47,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [role, setRole] = useState<UserRole>(null);
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [projectMode, setProjectMode] = useState<ProjectMode | null>(null);
 
   useEffect(() => {
     console.log("AuthProvider: Initializing...");
     
     // Check initial mock user state
     const savedMock = localStorage.getItem('dari_mock_user');
+    const savedMode = localStorage.getItem('dari_project_mode') as ProjectMode;
+    
+    if (savedMode) setProjectMode(savedMode);
+
     if (savedMock) {
       const mockUser = JSON.parse(savedMock);
       setUser(mockUser);
@@ -70,10 +79,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => unsubscribe();
   }, []);
 
-  const handleUser = (firebaseUser: User | null) => {
+  const handleUser = async (firebaseUser: User | null) => {
     console.log("AuthContext: Handling user:", firebaseUser?.email);
     
     if (firebaseUser) {
+      // 1. Fetch profile from Firestore to check for automatic direction
+      let autoMode: ProjectMode | null = null;
+      try {
+        const profileSnap = await getDoc(doc(db, 'profiles', firebaseUser.uid));
+        if (profileSnap.exists()) {
+          autoMode = profileSnap.data().project_mode as ProjectMode;
+        }
+      } catch (err) {
+        console.error("Error fetching profile mode:", err);
+      }
+
       const normalizedUser: AppUser = {
         id: firebaseUser.uid,
         uid: firebaseUser.uid,
@@ -86,6 +106,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       };
       setUser(normalizedUser);
+
+      // 2. Set project mode (Priority: 1. Firestore, 2. LocalStorage)
+      if (autoMode) {
+        setProjectMode(autoMode);
+        localStorage.setItem('dari_project_mode', autoMode);
+      } else {
+        const savedMode = localStorage.getItem('dari_project_mode') as ProjectMode;
+        if (savedMode) setProjectMode(savedMode);
+      }
 
       if (firebaseUser.email) {
         if (ADMIN_EMAILS.includes(firebaseUser.email)) {
@@ -126,7 +155,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const student = CUSTOM_STUDENTS.find(s => s.name.toUpperCase() === name.toUpperCase() && s.pin.toLowerCase() === pin.toLowerCase());
     
     if (student) {
-      // Mock user for PIN login
+      // Determine mode based on student name or custom logic
+      const mode: ProjectMode = name.toUpperCase().includes('ASMA') || name.toUpperCase().includes('HOSNA') ? 'afghan' : 'spanish';
+      
       const mockUser: AppUser = {
         id: `mock-${student.name.replace(/\s+/g, '-').toLowerCase()}`,
         uid: `mock-${student.name.replace(/\s+/g, '-').toLowerCase()}`,
@@ -138,7 +169,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       setUser(mockUser);
       setRole('student');
+      setProjectMode(mode);
       localStorage.setItem('dari_role', 'student');
+      localStorage.setItem('dari_project_mode', mode);
       localStorage.setItem('dari_mock_user', JSON.stringify(mockUser));
       return true;
     } else {
@@ -151,6 +184,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setRole(newRole);
     if (newRole) localStorage.setItem('dari_role', newRole);
     else localStorage.removeItem('dari_role');
+  };
+
+  const handleSetProjectMode = (mode: ProjectMode) => {
+    setProjectMode(mode);
+    localStorage.setItem('dari_project_mode', mode);
   };
 
   const logout = async () => {
@@ -166,7 +204,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ role, user, loading, authError, signInWithGoogle, signInWithName, loginWithRole, logout }}>
+    <AuthContext.Provider value={{ 
+      role, user, loading, authError, signInWithGoogle, signInWithName, loginWithRole, logout,
+      projectMode, setProjectMode: handleSetProjectMode
+    }}>
       {children}
     </AuthContext.Provider>
   );

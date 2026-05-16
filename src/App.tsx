@@ -15,6 +15,8 @@ import { Progress } from './components/features/Progress';
 import { Planning } from './components/features/Planning';
 import PlanningEditor from './components/features/PlanningEditor';
 import { WhatsAppAssistant } from './components/features/WhatsAppAssistant';
+import { ModeSelectionScreen } from './components/features/ModeSelectionScreen';
+import { translations } from './constants/translations';
 import { useDariData } from './hooks/useData';
 import { useStudentJourney } from './hooks/useStudentJourney';
 import { speechService } from './utils/speech';
@@ -27,7 +29,8 @@ export const App: React.FC = () => {
     speechService.preload();
   }, []);
 
-  const { role, user, logout } = useAuth();
+  const { role, user, logout, projectMode } = useAuth();
+  const t = translations[projectMode || 'spanish'];
   const [activeTab, setActiveTab] = useState<'adventure' | 'activities' | 'planning' | 'chat' | 'settings' | 'whatsapp'>('adventure');
   const [activeUnit, setActiveUnit] = useState<Unit | null>(null);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
@@ -152,9 +155,13 @@ export const App: React.FC = () => {
       <div id="loader">
         <img src={tulipIcon} alt="Logo" style={{ width: '440px', height: 'auto', marginBottom: '40px' }} />
         <div className="loader-spinner"></div>
-        <div className="loader-msg">Cargando el sistema...</div>
+        <div className="loader-msg">{t.loading}</div>
       </div>
     );
+  }
+
+  if (!projectMode) {
+    return <ModeSelectionScreen />;
   }
 
   if (!role) {
@@ -166,13 +173,13 @@ export const App: React.FC = () => {
     return (
       <div style={{ padding: '40px 20px', textAlign: 'center', background: 'var(--bg)', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
         <img src={tulipIcon} alt="Logo" style={{ width: '400px', height: 'auto', marginBottom: '40px' }} />
-        <h3 style={{ color: 'var(--ink2)', marginBottom: '10px', fontSize: '24px' }}>No se encontraron clases</h3>
+        <h3 style={{ color: 'var(--ink2)', marginBottom: '10px', fontSize: '24px' }}>{t.no_units}</h3>
         <p style={{ color: 'var(--ink4)', maxWidth: '400px', margin: '0 auto 24px' }}>
-          Las unidades de enseñanza no se han cargado.
+          {t.no_units_desc}
         </p>
         <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-          <button className="primary-btn" onClick={() => window.location.reload()} style={{ padding: '10px 20px' }}>Reintentar</button>
-          {role === 'admin' && <button className="secondary-btn" onClick={() => setActiveTab('planning')} style={{ padding: '10px 20px' }}>Ir a Planificación</button>}
+          <button className="primary-btn" onClick={() => window.location.reload()} style={{ padding: '10px 20px' }}>{t.retry}</button>
+          {role === 'admin' && <button className="secondary-btn" onClick={() => setActiveTab('planning')} style={{ padding: '10px 20px' }}>{t.go_planning}</button>}
         </div>
       </div>
     );
@@ -183,14 +190,14 @@ export const App: React.FC = () => {
 
       <div className="topbar">
         <div>
-          <div className="topbar-logo">Proyecto Puentes de Esperanza · 2026</div>
+          <div className="topbar-logo">{t.title}</div>
           <div className="topbar-name" style={{ textAlign: 'left' }}>
-            {user?.user_metadata?.full_name || 'Estudiante'}
+            {user?.user_metadata?.full_name || t.student}
           </div>
         </div>
         <div style={{ textAlign: 'right' }}>
           <span style={{ fontSize: '11px', color: 'var(--ink4)' }}>
-            {role === 'student' ? (user?.user_metadata?.full_name || 'Estudiante') : (settings?.med_name || 'Profesor(a)')}
+            {role === 'student' ? (user?.user_metadata?.full_name || t.student) : (settings?.med_name || t.role_teacher)}
           </span>
         </div>
       </div>
@@ -224,14 +231,14 @@ export const App: React.FC = () => {
               textTransform: 'uppercase',
               letterSpacing: '0.5px'
             }}>
-              Modo de Visualización
+              {t.view_mode}
             </span>
             <span style={{
               fontSize: '13px',
               fontWeight: 800,
               color: isPreviewMode ? 'white' : '#1e293b'
             }}>
-              {isPreviewMode ? 'Estudiante' : 'Administrador'}
+              {isPreviewMode ? t.student : t.admin}
             </span>
           </div>
 
@@ -257,9 +264,9 @@ export const App: React.FC = () => {
             }}
           >
             {isPreviewMode ? (
-              <><span>🔓</span> SALIR DEL PREVIEW</>
+              <><span>🔓</span> {t.exit_preview}</>
             ) : (
-              <><span>👁️</span> VER COMO ALUMNO</>
+              <><span>👁️</span> {t.enter_preview}</>
             )}
           </button>
         </div>
@@ -275,7 +282,7 @@ export const App: React.FC = () => {
           style={{ justifyContent: 'center', textAlign: 'center' }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <span style={{ fontSize: '22px', fontWeight: 900, lineHeight: 1 }}>Mis Clases</span>
+            <span style={{ fontSize: '22px', fontWeight: 900, lineHeight: 1 }}>{t.nav_classes}</span>
           </div>
         </button>
 
@@ -286,7 +293,7 @@ export const App: React.FC = () => {
             style={{ justifyContent: 'center', textAlign: 'center' }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <span style={{ fontSize: '18px', fontWeight: 900 }}>Planificación</span>
+              <span style={{ fontSize: '18px', fontWeight: 900 }}>{t.nav_planning}</span>
             </div>
           </button>
         )}
@@ -297,7 +304,7 @@ export const App: React.FC = () => {
           style={{ justifyContent: 'center', textAlign: 'center' }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <span style={{ fontSize: '22px', fontWeight: 900, lineHeight: 1 }}>Ayuda</span>
+            <span style={{ fontSize: '22px', fontWeight: 900, lineHeight: 1 }}>{t.nav_help}</span>
           </div>
         </button>
 
@@ -308,7 +315,7 @@ export const App: React.FC = () => {
              style={{ justifyContent: 'center', textAlign: 'center' }}
            >
              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-               <span style={{ fontSize: '18px', fontWeight: 900, lineHeight: 1 }}>Salir</span>
+               <span style={{ fontSize: '18px', fontWeight: 900, lineHeight: 1 }}>{t.nav_logout}</span>
              </div>
            </button>
         </div>
@@ -355,7 +362,7 @@ export const App: React.FC = () => {
                 <>
                   <div className="back-row">
                     <button className="back-btn" onClick={() => setActiveTab('adventure')}>←</button>
-                    <h2 className="screen-title" style={{ margin: 0 }}>Planificación</h2>
+                    <h2 className="screen-title" style={{ margin: 0 }}>{t.nav_planning}</h2>
                   </div>
                   <Planning
                     units={units}
@@ -428,8 +435,8 @@ export const App: React.FC = () => {
         <div className="celebration-overlay">
           <div className="celebration-card">
             <span className="cel-trophy">🏆</span>
-            <h2 className="cel-title">¡INCREÍBLE!</h2>
-            <p className="cel-sub">¡Has completado el desafío con éxito!</p>
+            <h2 className="cel-title">{t.celebration_title}</h2>
+            <p className="cel-sub">{t.celebration_sub}</p>
 
             <div className="cel-rewards">
               <div className="cel-reward-item">
@@ -443,7 +450,7 @@ export const App: React.FC = () => {
             </div>
 
             <button className="cel-btn" onClick={() => setCelebration(null)}>
-              CONTINUAR VIAJE
+              {t.continue}
             </button>
           </div>
         </div>
