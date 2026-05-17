@@ -78,17 +78,20 @@ export const ModeSelectionScreen: React.FC = () => {
           }}
         >
             <div style={{
-            width: '220px',
-            height: '220px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'white',
-            borderRadius: '30px',
-            filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.06))'
-          }}>
-            <img src={tulipIcon} style={{ width: '160px', height: '160px', objectFit: 'contain' }} alt="Afghan Emblem" />
-          </div>
+              width: '220px',
+              height: '220px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'white',
+              borderRadius: '30px',
+              filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.06))'
+            }}>
+              <picture>
+                <source srcSet={tulipIcon.replace(/\.(jpe?g|png)$/i, '.webp')} type="image/webp" />
+                <img src={tulipIcon} width={160} height={160} decoding="async" loading="lazy" style={{ objectFit: 'contain' }} alt="Afghan Emblem" />
+              </picture>
+            </div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '4px' }}>Comunidade</div>
             <p style={{ margin: '0', fontSize: '1.8rem', color: '#0f172a', fontWeight: 900 }}>Afegã</p>
@@ -131,17 +134,20 @@ export const ModeSelectionScreen: React.FC = () => {
           }}
         >
             <div style={{
-            width: '220px',
-            height: '220px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'white',
-            borderRadius: '30px',
-            filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.06))'
-          }}>
-            <img src={spanishEmblem} style={{ width: '160px', height: '160px', objectFit: 'contain' }} alt="Spanish Emblem" />
-          </div>
+              width: '220px',
+              height: '220px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'white',
+              borderRadius: '30px',
+              filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.06))'
+            }}>
+              <picture>
+                <source srcSet={spanishEmblem.replace(/\.(jpe?g|png)$/i, '.webp')} type="image/webp" />
+                <img src={spanishEmblem} width={160} height={160} decoding="async" loading="lazy" style={{ objectFit: 'contain' }} alt="Spanish Emblem" />
+              </picture>
+            </div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '4px' }}>Comunidade</div>
             <p style={{ margin: '0', fontSize: '1.8rem', color: '#0f172a', fontWeight: 900 }}>Hispana</p>
@@ -184,17 +190,20 @@ export const ModeSelectionScreen: React.FC = () => {
           }}
         >
             <div style={{
-            width: '220px',
-            height: '220px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'white',
-            borderRadius: '30px',
-            filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.06))'
-          }}>
-            <img src={sarehEmblem} style={{ width: '160px', height: '160px', objectFit: 'contain' }} alt="Sareh Emblem" />
-          </div>
+              width: '220px',
+              height: '220px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'white',
+              borderRadius: '30px',
+              filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.06))'
+            }}>
+              <picture>
+                <source srcSet={sarehEmblem.replace(/\.(jpe?g|png)$/i, '.webp')} type="image/webp" />
+                <img src={sarehEmblem} width={160} height={160} decoding="async" loading="lazy" style={{ objectFit: 'contain' }} alt="Sareh Emblem" />
+              </picture>
+            </div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '4px' }}>Comunidade</div>
             <p style={{ margin: '0', fontSize: '1.8rem', color: '#0f172a', fontWeight: 900 }}>SAREH - Apoio</p>
