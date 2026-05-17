@@ -8,9 +8,9 @@ import {
   Maximize, ChevronRight, ChevronLeft, ArrowLeft,
   Eye, Lock, Unlock, X, ClipboardList, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, AlignJustify, List, ListOrdered, Type, Eraser, Palette, Maximize2, Clock, Monitor, Smartphone as MobileIcon, Image as ImageIcon, AlertTriangle, Zap
 } from 'lucide-react';
-import memoryGameImg from '../../assets/memory_game.png';
-import wordGameImg from '../../assets/word_game.png';
-import startButtonDari from '../../assets/botão clique aqui em PersaDari (297 x 210 mm).png';
+import memoryGameImg from '../../assets/memory_game.jpeg';
+import wordGameImg from '../../assets/word_game.jpeg';
+import startButtonDari from '../../assets/botão clique aqui em PersaDari (297 x 210 mm).jpeg';
 import { HomeButton } from '../ui/HomeButton';
 import { QuestionBlock } from './QuestionBlock';
 import EmbedPreview from '../ui/EmbedPreview';
