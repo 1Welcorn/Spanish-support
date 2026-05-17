@@ -1,15 +1,13 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 // Build trigger: TS_ERRORS_FIXED_V2
 import type { Unit } from './types';
 import { useAuth } from './context/AuthContext';
 import { BookOpen, BarChart2, ClipboardList, MessageCircle, Lock, Unlock } from 'lucide-react';
-import homeButton from './assets/home-button.png';
-import classButton from './assets/class-button.png';
-import helpButton from './assets/help-button.png';
-import plansButton from './assets/plans-button.png';
 import { LoginScreen } from './components/features/LoginScreen';
 import { Dashboard } from './components/features/Dashboard';
-import tulipIcon from './assets/imagem do projeto.png';
+import tulipIcon from './assets/tulip icon.png';
+import spanishEmblem from './assets/Spanish cartoon emblem.png';
+import sarehEmblem from './assets/sareh emblem.png';
 import { Activities } from './components/features/Activities';
 import { Progress } from './components/features/Progress';
 import { Planning } from './components/features/Planning';
@@ -20,7 +18,7 @@ import { translations } from './constants/translations';
 import { useDariData } from './hooks/useData';
 import { useStudentJourney } from './hooks/useStudentJourney';
 import { speechService } from './utils/speech';
-import { DEFAULT_UNITS } from './constants';
+import { DEFAULT_UNITS } from './constants/index';
 import { db } from './services/firebase';
 import { setDoc, doc } from 'firebase/firestore';
 
@@ -29,19 +27,21 @@ export const App: React.FC = () => {
     speechService.preload();
   }, []);
 
-  const { role, user, logout, projectMode } = useAuth();
-  const t = translations[projectMode || 'spanish'];
+  const { role, user, logout, projectMode, loading: authLoading } = useAuth();
+  const t = useMemo(() => {
+    const mode = projectMode || 'spanish';
+    const found = translations[mode];
+    if (!found) {
+      console.warn(`Translations not found for mode: ${mode}, falling back to spanish`);
+      return translations['spanish'];
+    }
+    return found;
+  }, [projectMode]);
   const [activeTab, setActiveTab] = useState<'adventure' | 'activities' | 'planning' | 'chat' | 'settings' | 'whatsapp'>('adventure');
   const [activeUnit, setActiveUnit] = useState<Unit | null>(null);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [celebration, setCelebration] = useState<{ xp: number, stars: number } | null>(null);
   const [editingUnitId, setEditingUnitId] = useState<string | null>(null);
-  const [minLoadingTimePassed, setMinLoadingTimePassed] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setMinLoadingTimePassed(true), 5000);
-    return () => clearTimeout(timer);
-  }, []);
 
   const {
     units, sessions, answers, settings, loading, syncStatus,
@@ -49,56 +49,52 @@ export const App: React.FC = () => {
   } = useDariData();
 
   const hasSynced = useRef(false);
-  // Sync units to Supabase (Add missing or Update existing with new titles/icons)
+  
+  const handleGoHome = useCallback(() => setActiveUnit(null), []);
+  const handleToggle = useCallback(() => setActiveUnit(null), []);
+  const handleGoAdventure = useCallback(() => setActiveTab('adventure'), []);
+
+  const importDefaults = async () => {
+    try {
+      console.log("App: Iniciando sincronização total de 12 unidades...");
+      let count = 0;
+      for (const unit of DEFAULT_UNITS) {
+        // Forçamos o envio completo de cada unidade
+        await setDoc(doc(db, 'units', unit.id), {
+          ...unit,
+          updatedAt: new Date().toISOString()
+        }); // Removido o merge para garantir que os dados subam limpos
+        count++;
+        console.log(`App: Sincronizada ${count}/12: ${unit.title}`);
+      }
+      console.log("App: Sincronização concluída com sucesso!");
+      if (refresh) await refresh();
+      alert('Todas as 12 aulas foram sincronizadas com sucesso!');
+    } catch (err) {
+      console.error("Error importing default units:", err);
+      alert('Erro ao sincronizar aulas. Verifique sua conexão.');
+    }
+  };
+
+  // Sincronização Inteligente de Unidades
   useEffect(() => {
     const syncUnits = async () => {
-      if (role === 'admin' && units && units.length > 0 && !hasSynced.current) {
-        hasSynced.current = true;
-        console.log("Checking unit synchronization...");
-        let needsRefresh = false;
-
+      // Sincroniza se for admin e não tiver as 12 aulas completas
+      if (role === 'admin' && units && units.length < 12) {
+        console.log(`App: Detectadas apenas ${units.length} aulas. Sincronizando currículo completo...`);
         try {
           for (const defaultUnit of DEFAULT_UNITS) {
             const existing = units.find(u => u.id === defaultUnit.id);
-            
-            // Se não existe ou se campos principais mudaram
-            if (!existing || existing.title !== defaultUnit.title || existing.sub !== defaultUnit.sub || existing.sort_order !== defaultUnit.sort_order || existing.title_dari !== defaultUnit.title_dari || (defaultUnit.mystery_icon && existing.mystery_icon !== defaultUnit.mystery_icon)) {
-              console.log(`Force syncing unit: ${defaultUnit.title}`);
-              
-              const unitToSync = {
-                id: defaultUnit.id,
-                title: defaultUnit.title,
-                title_dari: defaultUnit.title_dari,
-                sub: defaultUnit.sub,
-                color: defaultUnit.color,
-                sort_order: defaultUnit.sort_order,
-                brief: defaultUnit.brief,
-                plan_c: defaultUnit.plan_c,
-                plan_h: defaultUnit.plan_h,
-                plan_e: defaultUnit.plan_e,
-                plan_a: defaultUnit.plan_a,
-                wa: defaultUnit.wa,
-                mystery_icon: defaultUnit.mystery_icon || (existing?.mystery_icon || null),
-                mystery_icon_size: defaultUnit.mystery_icon_size || (existing?.mystery_icon_size || 120),
-                questions: defaultUnit.questions,
-                external_links: defaultUnit.external_links
-              };
-
-              try {
-                await setDoc(doc(db, 'units', defaultUnit.id), unitToSync, { merge: true });
-                needsRefresh = true;
-              } catch (error: any) {
-                console.error(`Error syncing unit ${defaultUnit.id}:`, error.message);
-              }
+            if (!existing || existing.title !== defaultUnit.title) {
+              await setDoc(doc(db, 'units', defaultUnit.id), {
+                ...defaultUnit,
+                updatedAt: new Date().toISOString()
+              });
             }
           }
-
-          if (needsRefresh) {
-            console.log("Units updated, refreshing...");
-            refresh?.();
-          }
+          if (refresh) refresh();
         } catch (err) {
-          console.error("Critical error during unit synchronization:", err);
+          console.error("App: Erro na sincronização automática:", err);
         }
       }
     };
@@ -108,7 +104,7 @@ export const App: React.FC = () => {
   // Student Journey Hook for rewards
   const { addStudentRewards } = useStudentJourney(user?.id || '');
 
-  const handleGameOver = async (finalScore: number, wordsFound: number) => {
+  const handleGameOver = useCallback(async (finalScore: number, wordsFound: number) => {
     const xpGained = wordsFound * 5;
     const starsEarned = Math.floor(finalScore / 100);
 
@@ -117,7 +113,7 @@ export const App: React.FC = () => {
     if (success) {
       setCelebration({ xp: xpGained, stars: starsEarned });
     }
-  };
+  }, [addStudentRewards]);
 
   const sortedUnits = useMemo(() => {
     if (!units) return [];
@@ -147,15 +143,12 @@ export const App: React.FC = () => {
     return status;
   }, [sortedUnits, answers]);
 
-  console.log("App Rendering: Version - Mystery Icon Controls Added");
-  console.log("App State:", { role, loading, unitsCount: units?.length, settingsAvailable: !!settings, minLoadingTimePassed });
+  // REMOVED: Heavy Render Path Log to improve performance
 
-  if (loading || !minLoadingTimePassed) {
+  if (authLoading || loading) {
     return (
-      <div id="loader">
-        <img src={tulipIcon} alt="Logo" style={{ width: '440px', height: 'auto', marginBottom: '40px' }} />
+      <div id="loader" style={{ background: 'white' }}>
         <div className="loader-spinner"></div>
-        <div className="loader-msg">{t.loading}</div>
       </div>
     );
   }
@@ -169,17 +162,47 @@ export const App: React.FC = () => {
     return <LoginScreen settings={settings} />;
   }
 
-  if (!units || units.length === 0) {
+  if ((!units || units.length === 0) && role !== 'admin') {
     return (
-      <div style={{ padding: '40px 20px', textAlign: 'center', background: 'var(--bg)', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-        <img src={tulipIcon} alt="Logo" style={{ width: '400px', height: 'auto', marginBottom: '40px' }} />
+      <div style={{ padding: '40px 20px', textAlign: 'center', background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+        {/* Emblem Card Container */}
+        <div style={{ 
+          background: 'white', 
+          padding: '40px', 
+          borderRadius: 'var(--r-lg)', 
+          boxShadow: 'var(--shadow-soft)',
+          marginBottom: '40px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          animation: 'float 6s ease-in-out infinite'
+        }}>
+          <img 
+            src={projectMode === 'afghan' ? tulipIcon : (projectMode === 'spanish' ? spanishEmblem : sarehEmblem)} 
+            alt="Logo" 
+            style={{ width: '220px', height: '220px', objectFit: 'contain' }} 
+          />
+        </div>
         <h3 style={{ color: 'var(--ink2)', marginBottom: '10px', fontSize: '24px' }}>{t.no_units}</h3>
         <p style={{ color: 'var(--ink4)', maxWidth: '400px', margin: '0 auto 24px' }}>
-          {t.no_units_desc}
+          {syncStatus === 'err' ? 'Erro de conexão com o banco de dados.' : (isAdmin ? t.no_units_desc_admin || 'Você pode começar criando sua primeira aula ou importando os padrões no Planejamento.' : t.no_units_desc)}
         </p>
-        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-          <button className="primary-btn" onClick={() => window.location.reload()} style={{ padding: '10px 20px' }}>{t.retry}</button>
-          {role === 'admin' && <button className="secondary-btn" onClick={() => setActiveTab('planning')} style={{ padding: '10px 20px' }}>{t.go_planning}</button>}
+        <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
+          <button className="primary-btn" onClick={() => window.location.reload()} style={{ padding: '12px 24px' }}>{t.retry}</button>
+            <button 
+             onClick={logout} 
+             style={{ 
+               padding: '12px 24px', 
+               background: 'white', 
+               border: '2px solid var(--border)', 
+               borderRadius: '15px', 
+               fontWeight: 900, 
+               color: 'var(--ink3)',
+               cursor: 'pointer'
+             }}
+           >
+             {t.nav_logout_long || 'Sair / Trocar Comunidade'}
+           </button>
         </div>
       </div>
     );
@@ -273,7 +296,11 @@ export const App: React.FC = () => {
       )}
       <aside className="sidebar-kids" style={{ background: 'rgba(216, 180, 216, 0.1)', backdropFilter: 'var(--glass)', borderRight: '1px solid var(--border)' }}>
         <div style={{ textAlign: 'center', marginBottom: '48px', padding: '24px 0' }}>
-          <img src={tulipIcon} alt="Projeto Logo" style={{ width: '200px', height: 'auto', marginBottom: '15px' }} />
+          <img 
+            src={projectMode === 'afghan' ? tulipIcon : (projectMode === 'spanish' ? spanishEmblem : sarehEmblem)} 
+            alt="Projeto Logo" 
+            style={{ width: '260px', height: '260px', objectFit: 'contain', marginBottom: '15px' }} 
+          />
         </div>
 
         <button 
@@ -337,6 +364,8 @@ export const App: React.FC = () => {
               answers={answers}
               isAdmin={role === 'admin' && !isPreviewMode}
               onUpdateUnit={updateUnit}
+              onSyncDefaults={importDefaults}
+              t={t}
             />
           )}
 
@@ -352,8 +381,8 @@ export const App: React.FC = () => {
               onCreateUnit={createUnit}
               onGameOver={handleGameOver}
               initialExpandedId={activeUnit.id}
-              onGoHome={() => setActiveUnit(null)}
-              onToggle={() => setActiveUnit(null)}
+              onGoHome={handleGoHome}
+              onToggle={handleToggle}
             />
           )}
           {activeTab === 'planning' && role === 'admin' && (
@@ -373,6 +402,7 @@ export const App: React.FC = () => {
                     onEditDetails={(id) => setEditingUnitId(id)}
                     onSaveSession={saveSession}
                     onResetProgress={resetUnitAnswers}
+                    onImportDefaults={importDefaults}
                   />
                 </>
               ) : (
@@ -397,15 +427,15 @@ export const App: React.FC = () => {
               onUpdateUnit={updateUnit}
               onCreateUnit={createUnit}
               onGameOver={handleGameOver}
-              onGoHome={() => setActiveTab('adventure')}
-              onToggle={() => setActiveTab('adventure')}
+              onGoHome={handleGoAdventure}
+              onToggle={handleGoAdventure}
             />
           )}
           {activeTab === 'whatsapp' && (
             <div>
               <div className="back-row">
                 <button className="back-btn" onClick={() => setActiveTab('adventure')}>←</button>
-                <h2 className="screen-title" style={{ margin: 0 }}>Asistente de Ayuda</h2>
+                <h2 className="screen-title" style={{ margin: 0 }}>Assistente de Ajuda</h2>
               </div>
               <WhatsAppAssistant
                 units={units}
@@ -417,15 +447,15 @@ export const App: React.FC = () => {
             <div>
               <div className="back-row">
                 <button className="back-btn" onClick={() => setActiveTab('adventure')}>←</button>
-                <h2 className="screen-title" style={{ margin: 0 }}>Configuraciones</h2>
+                <h2 className="screen-title" style={{ margin: 0 }}>Configurações</h2>
               </div>
               <div className="settings-section">
                 <div className="settings-row">
                   <div className="settings-row-label">E-mail conectado</div>
-                  <div className="settings-row-sub">{role === 'admin' ? 'Administrador' : 'Profesor'}</div>
+                  <div className="settings-row-sub">{role === 'admin' ? 'Administrador' : 'Professor'}</div>
                 </div>
               </div>
-              <button className="logout-btn" onClick={logout}>Salir / Cambiar perfil</button>
+              <button className="logout-btn" onClick={logout}>Sair / Mudar perfil</button>
             </div>
           )}
         </main>

@@ -1,9 +1,13 @@
 import React from 'react';
-import { useAuth } from '../../context/AuthContext';
-import projectLogo from '../../assets/imagem do projeto.png';
+import { useAuth, CUSTOM_STUDENTS } from '../../context/AuthContext';
+import { translations } from '../../constants/translations';
+import projectLogo from '../../assets/tulip icon.png';
+import tulipIcon from '../../assets/tulip icon.png';
+import spanishEmblem from '../../assets/Spanish cartoon emblem.png';
+import sarehEmblem from '../../assets/sareh emblem.png';
 import { User, Lock, ArrowRight } from 'lucide-react';
 
-const StudentLoginCard: React.FC<{ name: string }> = ({ name }) => {
+const StudentLoginCard: React.FC<{ name: string; t: any }> = ({ name, t }) => {
   const [pin, setPin] = React.useState('');
   const [showPin, setShowPin] = React.useState(false);
   const { signInWithName, loading } = useAuth();
@@ -15,45 +19,45 @@ const StudentLoginCard: React.FC<{ name: string }> = ({ name }) => {
 
   if (!showPin) {
     return (
-      <button 
-        onClick={() => setShowPin(true)}
+      <div
+        className="student-card-v5"
+        onClick={() => setShowPin(!showPin)}
         style={{
-          background: 'var(--color-cloud-core)',
-          border: '2px solid var(--border)',
-          borderRadius: '16px',
-          padding: '16px',
+          background: 'rgba(255, 255, 255, 0.6)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid var(--border)',
+          borderRadius: '20px',
+          padding: '10px 20px',
           display: 'flex',
           alignItems: 'center',
-          gap: '12px',
+          gap: '15px',
           cursor: 'pointer',
-          width: '100%',
-          textAlign: 'left',
-          transition: 'all 0.2s'
+          transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+          position: 'relative',
+          overflow: 'hidden'
         }}
-        onMouseOver={(e) => e.currentTarget.style.borderColor = 'var(--color-accent-blue)'}
-        onMouseOut={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
       >
-        <div style={{ background: 'var(--color-accent-blue)', color: 'white', borderRadius: '12px', padding: '10px' }}>
+        <div style={{ background: 'var(--color-accent-blue)', color: 'white', padding: '10px', borderRadius: '14px' }}>
           <User size={20} />
         </div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 900, fontSize: '14px', color: 'var(--ink1)' }}>{name}</div>
-          <div style={{ fontSize: '11px', color: 'var(--ink4)' }}>Haz clic para entrar</div>
+          <div style={{ fontWeight: 900, color: 'var(--ink1)', fontSize: '14px', letterSpacing: '0.5px' }}>{name}</div>
+          <div style={{ fontSize: '11px', color: 'var(--ink4)', fontWeight: 600 }}>{t.login_click_to_enter}</div>
         </div>
-        <ArrowRight size={18} color="var(--border)" />
-      </button>
+        <ArrowRight size={16} color="var(--border)" />
+      </div>
     );
   }
 
   return (
     <div style={{ background: 'white', border: '2px solid var(--color-accent-blue)', borderRadius: '24px', padding: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', position: 'relative' }}>
-      <button onClick={() => setShowPin(false)} style={{ position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', color: 'var(--ink4)', cursor: 'pointer', fontSize: '12px' }}>volver</button>
+      <button onClick={() => setShowPin(false)} style={{ position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', color: 'var(--ink4)', cursor: 'pointer', fontSize: '12px' }}>voltar</button>
       <div style={{ fontWeight: 900, fontSize: '16px', marginBottom: '15px', textAlign: 'center', color: 'var(--color-accent-blue)' }}>{name}</div>
       <div style={{ position: 'relative', marginBottom: '15px' }}>
         <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ink4)' }}><Lock size={16} /></div>
-        <input 
-          type="password" 
-          placeholder="Ingresa tu contraseña..."
+        <input
+          type="password"
+          placeholder="Digite sua senha..."
           value={pin}
           onChange={(e) => setPin(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
@@ -68,7 +72,7 @@ const StudentLoginCard: React.FC<{ name: string }> = ({ name }) => {
           }}
         />
       </div>
-      <button 
+      <button
         onClick={handleLogin}
         disabled={loading || !pin}
         style={{
@@ -90,33 +94,98 @@ const StudentLoginCard: React.FC<{ name: string }> = ({ name }) => {
 };
 
 export const LoginScreen: React.FC<{ settings: any }> = () => {
-  const { 
-    signInWithGoogle, 
+  const {
+    signInWithGoogle,
     loading,
-    authError
+    authError,
+    projectMode,
+    setProjectMode
   } = useAuth();
+
+  const t = translations[projectMode || 'spanish'];
+
+  // Pick the right emblem based on mode
+  let currentEmblem = projectLogo;
+  if (projectMode === 'afghan') currentEmblem = tulipIcon;
+  else if (projectMode === 'spanish') currentEmblem = spanishEmblem;
+  else if (projectMode === 'sareh') currentEmblem = sarehEmblem;
 
   return (
     <div id="login-screen">
       <div className="login-card">
-        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-          <img src={projectLogo} alt="Logo" style={{ width: '280px', height: 'auto' }} />
+        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+          <img src={currentEmblem} alt="Logo" style={{ height: '150px', width: 'auto', maxWidth: '240px', objectFit: 'contain' }} />
+          {/* TITULO DINAMICO */}
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: projectMode === 'spanish' ? 'column' : 'column', // Mantendo coluna para o container principal
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            gap: '4px', 
+            marginBottom: '12px' 
+          }}>
+            {projectMode === 'spanish' ? (
+              <>
+                <h1 style={{ fontSize: '28px', fontWeight: 900, color: 'var(--color-foliage)', margin: 0 }}>
+                  {t.login_welcome.split(' / ')[0]}
+                </h1>
+                <h1 style={{ fontSize: '24px', fontWeight: 900, color: 'var(--color-foliage)', margin: 0, opacity: 0.9 }}>
+                  {t.login_welcome.split(' / ')[1]}
+                </h1>
+              </>
+            ) : (
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <h1 style={{ fontSize: '26px', fontWeight: 900, color: 'var(--color-foliage)', margin: 0 }}>
+                  {t.login_welcome.split(' / ')[0]}
+                </h1>
+                {t.login_welcome.includes(' / ') && (
+                  <h1 style={{ fontSize: '24px', fontWeight: 900, color: 'var(--color-foliage)', margin: 0, direction: 'rtl', opacity: 0.9 }}>
+                    {t.login_welcome.split(' / ')[1]}
+                  </h1>
+                )}
+              </div>
+            )}
+            <p style={{ fontSize: '13px', color: 'var(--ink4)', fontWeight: 600, margin: 0 }}>
+              (Welcome!)
+            </p>
+          </div>
+
+          {/* SUBTITULO DINAMICO */}
+          <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            {projectMode === 'spanish' ? (
+              <>
+                <p style={{ fontSize: '15px', color: 'var(--ink3)', fontWeight: 700, margin: 0 }}>
+                  {t.login_sub.split(' / ')[0]}
+                </p>
+                <p style={{ fontSize: '14px', color: 'var(--ink3)', fontWeight: 600, margin: 0, opacity: 0.8 }}>
+                  {t.login_sub.split(' / ')[1]}
+                </p>
+              </>
+            ) : (
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <p style={{ fontSize: '14px', color: 'var(--ink3)', fontWeight: 700, margin: 0 }}>
+                  {t.login_sub.split(' / ')[0]}
+                </p>
+                {t.login_sub.includes(' / ') && (
+                  <p style={{ fontSize: '13px', color: 'var(--ink3)', fontWeight: 600, margin: 0, direction: 'rtl', opacity: 0.8 }}>
+                    {t.login_sub.split(' / ')[1]}
+                  </p>
+                )}
+              </div>
+            )}
+            <p style={{ fontSize: '12px', color: 'var(--ink4)', opacity: 0.8, margin: 0 }}>
+              (Your learning platform)
+            </p>
+          </div>
         </div>
-        <h1 className="login-title" style={{ marginBottom: '8px' }}>
-          ¡Bienvenido(a)! <br/><span style={{fontSize: '22px', color: '#64748b', fontWeight: 700}}>(Welcome!)</span>
-        </h1>
-        <p className="login-sub" style={{ marginTop: '10px' }}>
-          Tu plataforma de aprendizaje <br />
-          <span style={{fontSize: '13px', color: '#94a3b8'}}>(Your learning platform)</span>
-        </p>
 
         {authError && (
-          <div className="auth-error-message" style={{ 
-            backgroundColor: '#fee2e2', 
-            color: '#b91c1c', 
-            padding: '12px', 
-            borderRadius: '8px', 
-            fontSize: '13px', 
+          <div className="auth-error-message" style={{
+            backgroundColor: '#fee2e2',
+            color: '#b91c1c',
+            padding: '12px',
+            borderRadius: '8px',
+            fontSize: '13px',
             marginBottom: '20px',
             border: '1px solid #fecaca'
           }}>
@@ -129,12 +198,12 @@ export const LoginScreen: React.FC<{ settings: any }> = () => {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {/* Google Login for Admin/Mediator */}
-            <button 
-              className="login-btn" 
+            <button
+              className="login-btn"
               onClick={signInWithGoogle}
-              style={{ 
-                background: '#fff', 
-                border: '1.5px solid var(--border)', 
+              style={{
+                background: '#fff',
+                border: '1.5px solid var(--border)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -152,30 +221,51 @@ export const LoginScreen: React.FC<{ settings: any }> = () => {
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
               </svg>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                <span style={{ fontWeight: 800, fontSize: '15px' }}>Admin / Profesor</span>
+                <span style={{ fontWeight: 800, fontSize: '15px' }}>Admin / Professor</span>
               </div>
             </button>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '10px 0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', margin: '16px 0' }}>
               <div style={{ flex: 1, height: '1px', background: 'var(--border)' }}></div>
-              <span style={{ fontSize: '11px', color: 'var(--ink4)', fontWeight: 700 }}>ACCESO ALUMNOS</span>
+              <span style={{ fontSize: '10px', fontWeight: 900, color: 'var(--ink4)', letterSpacing: '1px' }}>
+                {t.login_student_access}
+              </span>
               <div style={{ flex: 1, height: '1px', background: 'var(--border)' }}></div>
             </div>
 
-            {/* Student Login Options */}
+            {/* Student Login Options (Filtered by Community) */}
             <div style={{ display: 'grid', gap: '12px' }}>
-              {[
-                { name: 'ASMA QARI ZADAH', id: 'asma' },
-                { name: 'HOSNA QARI ZADAH', id: 'hosna' }
-              ].map(student => (
-                <StudentLoginCard key={student.id} name={student.name} />
-              ))}
+              {CUSTOM_STUDENTS
+                .filter(student => student.mode === projectMode)
+                .map(student => (
+                  <StudentLoginCard key={student.name} name={student.name} t={t} />
+                ))}
             </div>
           </div>
         )}
 
-        <div style={{ marginTop: '40px', fontSize: '11px', color: 'var(--ink4)', textAlign: 'center' }}>
-          Proyecto Puentes de Esperanza · 2026
+        <div style={{ marginTop: '30px', borderTop: '1px solid var(--border)', paddingTop: '20px' }}>
+          <button
+            onClick={() => {
+              localStorage.removeItem('dari_project_mode');
+              setProjectMode(null);
+            }}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--color-accent-blue)',
+              fontSize: '13px',
+              fontWeight: 800,
+              cursor: 'pointer',
+              textDecoration: 'underline'
+            }}
+          >
+            {t.login_back}
+          </button>
+        </div>
+
+        <div style={{ marginTop: '20px', fontSize: '11px', color: 'var(--ink4)', textAlign: 'center' }}>
+          {t.login_footer}
         </div>
       </div>
     </div>

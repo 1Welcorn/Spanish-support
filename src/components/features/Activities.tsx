@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import type { Unit, Question, ExternalLink } from '../../types';
-import { COLORS } from '../../constants';
+import { COLORS } from '../../constants/index';
 import {
   Sparkles, Plus, FileText, ChevronDown,
   Trash2, Info, Edit2,
@@ -8,7 +8,6 @@ import {
   Maximize, ChevronRight, ChevronLeft, ArrowLeft,
   Eye, Lock, Unlock, X, ClipboardList, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, AlignJustify, List, ListOrdered, Type, Eraser, Palette, Maximize2, Clock, Monitor, Smartphone as MobileIcon, Image as ImageIcon, AlertTriangle, Zap
 } from 'lucide-react';
-import homeButtonImg from '../../assets/home-button.png';
 import memoryGameImg from '../../assets/memory_game.png';
 import wordGameImg from '../../assets/word_game.png';
 import startButtonDari from '../../assets/botão clique aqui em PersaDari (297 x 210 mm).png';
@@ -46,8 +45,13 @@ const RichTextEditor: React.FC<{ value: string; onChange: (val: string) => void 
 
 // --- UNIVERSAL MEDIA PLAYER (V10) ---
 export const VideoPlayerV5: React.FC<{ media: ExternalLink }> = ({ media }) => {
-  // Converte URLs do player da Cloudinary para URLs diretas de vídeo (MP4) para ter controle nativo do delay
+  // Escolha dinâmica da URL baseada no projectMode
+  const { projectMode } = useAuth();
   let actualUrl = media.url;
+  if (projectMode === 'afghan' && media.url_afghan) actualUrl = media.url_afghan;
+  else if (projectMode === 'spanish' && media.url_spanish) actualUrl = media.url_spanish;
+  else if (projectMode === 'sareh' && media.url_sareh) actualUrl = media.url_sareh;
+
   if (actualUrl.includes('player.cloudinary.com/embed')) {
     try {
       const urlObj = new URL(actualUrl);
@@ -100,7 +104,7 @@ export const VideoPlayerV5: React.FC<{ media: ExternalLink }> = ({ media }) => {
       videoRef.current.currentTime = 0;
     }
 
-    const delayTime = media.delay !== undefined ? media.delay * 1000 : 2000;
+    const delayTime = media.delay !== undefined ? media.delay * 1000 : 500;
     const timer = setTimeout(() => {
       if (isIframeEmbed) {
         try {
@@ -190,6 +194,7 @@ const StepNavigation: React.FC<{
   isFirstUnit?: boolean;
   onGoHome?: () => void;
 }> = ({ unit, answers, onSaveAnswer, isAdmin, isMediator, editQuestion, deleteQuestion, currentColors, onStartGame, handleUpdateUnitContent, onSaveSession, onToggle, completeLesson, isFirstUnit, onGoHome }) => {
+  const { projectMode } = useAuth();
   const [activeStep, setActiveStep] = useState(0);
   const [isEditingBrief, setIsEditingBrief] = useState(false);
   const [tempBrief, setTempBrief] = useState(unit.brief || '');
@@ -198,6 +203,49 @@ const StepNavigation: React.FC<{
 
   useEffect(() => { if (isEditingBrief) { setTempBrief(unit.brief || ''); setTempLinks(unit.external_links || []); } }, [isEditingBrief, unit]);
 
+  const tStr = (unit.sub || unit.title || '').toLowerCase();
+  let titleDari = '';
+  let titlePT = '';
+  let titleEN = '';
+  if (tStr.includes('cozinha') || tStr.includes('cocina')) { titleDari = 'لغات آشپزخانه'; titlePT = 'Nossa Cozinha'; titleEN = 'Kitchen Vocabulary'; }
+  else if (tStr.includes('oral') || tStr.includes('escuta') || tStr.includes('comprensión')) { titleDari = 'درک شنوایی'; titlePT = 'Compreensão Oral'; titleEN = 'Listening Comprehension'; }
+  else if (tStr.includes('apresentação') || tStr.includes('presentación')) { titleDari = 'معرفی خود'; titlePT = 'Apresentação Pessoal'; titleEN = 'Personal Presentation'; }
+  else if (tStr.includes('cotidiano')) { titleDari = 'انگلیسی در زندگی روزمره'; titlePT = 'Inglês no Cotidiano'; titleEN = 'Everyday English'; }
+  else if (tStr.includes('digitais') || tStr.includes('digitales')) { titleDari = 'موضوعات دیجیتال'; titlePT = 'Temas Digitais'; titleEN = 'Digital Themes'; }
+  else if (tStr.includes('receita') || tStr.includes('receta')) { titleDari = 'طرز تهیه غذا'; titlePT = 'Receita'; titleEN = 'Recipe'; }
+  else if (tStr.includes('cores') || tStr.includes('colores')) { titleDari = 'رنگ‌ها و میوه‌ها'; titlePT = 'Cores e Frutas'; titleEN = 'Colors and Fruits'; }
+  else if (tStr.includes('números') || tStr.includes('numero') || tStr.includes('número')) { titleDari = 'اعداد و مقدار'; titlePT = 'Números e Quantidade'; titleEN = 'Numbers and Quantity'; }
+  else if (tStr.includes('família') || tStr.includes('familia')) { titleDari = 'خانواده من'; titlePT = 'Minha Família'; titleEN = 'My Family'; }
+  else if (tStr.includes('corpo') || tStr.includes('cuerpo')) { titleDari = 'اعضای بدن'; titlePT = 'Partes do Corpo'; titleEN = 'Body Parts'; }
+  else if (tStr.includes('animais') || tStr.includes('animales')) { titleDari = 'حیوانات و صداها'; titlePT = 'Animais e Sons'; titleEN = 'Animals and Sounds'; }
+  else if (tStr.includes('revisão') || tStr.includes('revisión')) { titleDari = 'مرور درس'; titlePT = 'Revisão do Módulo'; titleEN = 'Module Review'; }
+  else {
+    titleDari = unit.title_dari || '';
+    titlePT = unit.title || '';
+    titleEN = unit.title_dari || '';
+  }
+
+  let mainTitle = unit.title; // Default is Portuguese
+  let secondaryTitle = '';
+  let tertiaryTitle = unit.title_dari || ''; // English Study
+
+  if (projectMode === 'afghan') {
+    mainTitle = titleDari || unit.title_dari; // Dari
+    secondaryTitle = unit.title; // Portuguese (Bridge)
+    tertiaryTitle = titleEN || unit.title_dari; // English
+  } else if (projectMode === 'sareh') {
+    mainTitle = unit.title_sareh || titlePT || unit.title; // Prefer localized SAREH title
+    secondaryTitle = '';
+    tertiaryTitle = titleEN || unit.title_dari; // English
+  } else if (projectMode === 'spanish') {
+    mainTitle = unit.title_spanish || (tStr.includes('cocina') ? 'Nuestra Cocina' : 
+                tStr.includes('colores') ? 'Colores y Frutas' :
+                tStr.includes('familia') ? 'Mi Familia' : 
+                unit.title); // Fallback to logic or PT
+    secondaryTitle = unit.title; // Portuguese (Bridge)
+    tertiaryTitle = titleEN || unit.title_dari; // English
+  }
+
   const steps: StepContent[] = [];
   // 1. Welcome Page (Guia de Estudo)
   if (unit.brief || (unit.external_links && unit.external_links.length > 0)) steps.push({ type: 'brief' });
@@ -205,10 +253,17 @@ const StepNavigation: React.FC<{
   // 3. Atividades Interativas (Wordwall/Canva)
   (unit.embed_urls || []).forEach((e: any, i: number) => {
     const eObj = typeof e === 'string' ? { url: e } : e;
+    
+    // Seleção dinâmica da URL para atividades embed
+    let finalUrl = eObj.url;
+    if (projectMode === 'afghan' && eObj.url_afghan) finalUrl = eObj.url_afghan;
+    else if (projectMode === 'spanish' && eObj.url_spanish) finalUrl = eObj.url_spanish;
+    else if (projectMode === 'sareh' && eObj.url_sareh) finalUrl = eObj.url_sareh;
+
     steps.push({
       ...eObj,
       type: 'embed',
-      url: normalizeEmbedUrl(eObj.url),
+      url: normalizeEmbedUrl(finalUrl),
       idx: i
     });
   });
@@ -229,7 +284,7 @@ const StepNavigation: React.FC<{
     <div className={`activities-v5-wrapper step-type-${current.type}`}>
       <div className="profile-header-image-style" style={{ margin: '4px auto 0' }}>
         <div className="avatar-and-name">
-          <h2 style={{ fontSize: '20px', margin: 0, fontWeight: 900 }}>Proyecto Puentes de Esperanza ☀️</h2>
+          <h2 style={{ fontSize: '20px', margin: 0, fontWeight: 900 }}>Projeto Pontes da Esperança ☀️</h2>
         </div>
         <div className="header-nav-mini">
           <button className="header-nav-btn-v7 prev" onClick={handleBack} disabled={activeStep === 0}><ChevronLeft size={20} /></button>
@@ -261,8 +316,12 @@ const StepNavigation: React.FC<{
         {current.type === 'brief' && (
           <div className="mission-intro-card-v7 dynamic-wrap-v7">
             <div className="mission-content-v7">
-              <span className="mission-tag-v7">GUÍA DE ESTUDIO</span>
-              <h1 className="mission-subtitle-v7 main-theme">{unit.title}</h1>
+              <span className="mission-tag-v7">GUIA DE ESTUDO</span>
+              <h1 className="mission-subtitle-v7 main-theme" style={{ direction: projectMode === 'afghan' ? 'rtl' : 'ltr' }}>
+                {mainTitle}
+              </h1>
+              {secondaryTitle && <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--ink4)', marginTop: '-15px', marginBottom: '4px' }}>{secondaryTitle}</div>}
+              {tertiaryTitle && <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--ink3)', fontStyle: 'italic', marginBottom: '15px' }}>{tertiaryTitle}</div>}
               <div dangerouslySetInnerHTML={{ __html: unit.brief || '' }} style={{ fontSize: '16px', lineHeight: '1.6' }} />
               {isAdmin && <button className="play-btn-v7-mission" onClick={() => setIsEditingBrief(true)} style={{ background: '#f59e0b', marginTop: '20px' }}>Editar Contenido</button>}
             </div>
@@ -287,8 +346,10 @@ const StepNavigation: React.FC<{
             }}
           >
             <div className="mission-content-v7">
-              <span className="mission-tag-v7" style={{ background: '#dbeafe', color: '#1d4ed8' }}>ACTIVIDAD INTERACTIVA</span>
-              <h1 className="mission-subtitle-v7 main-theme" dangerouslySetInnerHTML={{ __html: current.title || 'Actividad' }} />
+              <span className="mission-tag-v7" style={{ background: '#dbeafe', color: '#1d4ed8' }}>ATIVIDADE INTERATIVA</span>
+              <h1 className="mission-subtitle-v7 main-theme" style={{ direction: projectMode === 'afghan' ? 'rtl' : 'ltr' }} dangerouslySetInnerHTML={{ __html: mainTitle }} />
+              {secondaryTitle && <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--ink4)', marginTop: '-15px', marginBottom: '4px' }}>{secondaryTitle}</div>}
+              {tertiaryTitle && <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--ink3)', fontStyle: 'italic', marginBottom: '15px' }}>{tertiaryTitle}</div>}
               {current.brief && <div dangerouslySetInnerHTML={{ __html: current.brief }} style={{ fontSize: '16px', lineHeight: '1.6' }} />}
             </div>
             <div 
@@ -314,8 +375,8 @@ const StepNavigation: React.FC<{
 
         {current.type === 'game' && (
           <div className="mission-intro-card-v7 dynamic-wrap-v7" style={{ minHeight: '300px', textAlign: 'center', flexDirection: 'column' }}>
-            <h2 style={{ fontWeight: 900, marginBottom: '20px' }}>¡Hora del Desafío WordFall! 🎮</h2>
-            <button className="play-btn-v7-mission" onClick={onStartGame} style={{ background: '#10b981', padding: '20px 60px', fontSize: '20px' }}>JUGAR AHORA</button>
+            <h2 style={{ fontWeight: 900, marginBottom: '20px' }}>Hora do Desafio WordFall! 🎮</h2>
+            <button className="play-btn-v7-mission" onClick={onStartGame} style={{ background: '#10b981', padding: '20px 60px', fontSize: '20px' }}>JOGAR AGORA</button>
           </div>
         )}
 
@@ -326,18 +387,60 @@ const StepNavigation: React.FC<{
               flexDirection: 'column', 
               alignItems: 'stretch',
               width: current.width || '100%', 
-              maxWidth: current.width || '1500px',
-              minHeight: current.height ? `${current.height}px` : '400px',
-              borderRadius: current.borderRadius !== undefined ? `${current.borderRadius}px` : '50px',
-              padding: `${current.framePadding || '0px'} 60px 60px`,
-              background: current.frameColor || 'white',
-              boxShadow: current.frameColor === 'transparent' ? 'none' : '0 40px 100px rgba(0,0,0,0.07)'
+              maxWidth: '1500px',
+              minHeight: '400px',
+              borderRadius: '50px',
+              padding: '60px',
+              background: 'white',
+              boxShadow: '0 40px 100px rgba(0,0,0,0.07)'
             }}
           >
             <div style={{ marginBottom: '10px' }}>
-              <span className="mission-tag-v7" style={{ background: '#f3e8ff', color: '#7c3aed' }}>PREGUNTA {(current.idx as number) + 1}</span>
+              <span className="mission-tag-v7" style={{ background: '#f3e8ff', color: '#7c3aed' }}>PERGUNTA {(current.idx as number) + 1}</span>
             </div>
             <QuestionBlock question={current.q as any} index={current.idx as any} unitId={unit.id} onSaveAnswer={(val) => onSaveAnswer(current.idx as any, val)} isAdmin={isAdmin} color={currentColors?.main || '#10b981'} />
+          </div>
+        )}
+
+        {current.type === 'report' && (
+          <div className="mission-intro-card-v7" style={{ textAlign: 'center', padding: '60px', maxWidth: '800px', width: '100%' }}>
+            <h2 style={{ fontSize: '28px', fontWeight: 900, color: 'var(--ink1)', marginBottom: '10px' }}>Relatório do Mediador</h2>
+            <p style={{ color: '#64748b', marginBottom: '30px' }}>Documente como foi o desempenho do aluno nesta aula.</p>
+            <textarea 
+              placeholder="Escreva aqui suas observações (ex: O aluno teve dificuldade com a pronúncia de 'Spoon')..."
+              style={{ width: '100%', minHeight: '200px', padding: '20px', borderRadius: '20px', border: '2px solid #e2e8f0', fontSize: '16px', marginBottom: '20px', resize: 'vertical' }}
+              id="report-note"
+            ></textarea>
+            <button 
+              className="play-btn-v7-mission"
+              style={{ background: '#10b981', padding: '15px 40px', fontSize: '18px' }}
+              onClick={async () => {
+                const note = (document.getElementById('report-note') as HTMLTextAreaElement).value;
+                if (!note) return alert('Por favor, escreva uma observação antes de salvar.');
+                const success = await onSaveSession(note);
+                if (success) {
+                  alert('Relatório salvo com sucesso!');
+                  onToggle?.();
+                }
+              }}
+            >
+              SALVAR RELATÓRIO E FINALIZAR
+            </button>
+          </div>
+        )}
+
+        {current.type === 'congratulations' && (
+          <div className="mission-intro-card-v7" style={{ textAlign: 'center', padding: '60px', maxWidth: '800px', width: '100%' }}>
+            <div style={{ fontSize: '80px', marginBottom: '20px' }}>🎉</div>
+            <h2 style={{ fontSize: '32px', fontWeight: 900, color: 'var(--ink1)', marginBottom: '10px' }}>Parabéns!</h2>
+            <p style={{ fontSize: '18px', color: '#64748b', marginBottom: '40px' }}>Você completou todos os desafios da aula <strong>{unit.title}</strong>.</p>
+            <button 
+              className="play-btn-v7-mission"
+              style={{ background: 'var(--color-accent-blue)', padding: '15px 40px', fontSize: '18px' }}
+              onClick={() => onToggle?.()}
+            >
+              VOLTAR PARA AS AULAS
+            </button>
           </div>
         )}
 
@@ -348,7 +451,7 @@ const StepNavigation: React.FC<{
           <header style={{ padding: '15px 30px', background: 'white', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <Zap size={24} color="#f59e0b" fill="#f59e0b" />
-              <h2 style={{ margin: 0, fontWeight: 900 }}>Editor Maestro Ultra Rápido ⚡</h2>
+              <h2 style={{ margin: 0, fontWeight: 900 }}>Editor Mestre Ultra Rápido ⚡</h2>
             </div>
             <div style={{ display: 'flex', gap: '10px' }}>
               <button onClick={async () => {
@@ -356,7 +459,7 @@ const StepNavigation: React.FC<{
                 const { success } = await handleUpdateUnitContent({ brief: tempBrief, external_links: tempLinks.map(l => ({ ...l })) });
                 if (success) { setSaveStatus('success'); setTimeout(() => { setSaveStatus('idle'); setIsEditingBrief(false); }, 800); }
               }} style={{ background: '#10b981', color: 'white', padding: '10px 25px', borderRadius: '12px', border: 'none', fontWeight: 900, cursor: 'pointer' }}>
-                {saveStatus === 'saving' ? 'Guardando...' : saveStatus === 'success' ? 'Guardado ✓' : 'Guardar Cambios'}
+                {saveStatus === 'saving' ? 'Salvando...' : saveStatus === 'success' ? 'Salvo ✓' : 'Salvar Alterações'}
               </button>
               <button onClick={() => setIsEditingBrief(false)} style={{ background: '#f1f5f9', padding: '10px', borderRadius: '12px', border: 'none' }}><X size={20} /></button>
             </div>
@@ -364,54 +467,54 @@ const StepNavigation: React.FC<{
 
           <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 340px 1fr', gap: '20px', padding: '20px', overflow: 'hidden' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <h4 style={{ margin: 0, color: '#64748b', fontSize: '11px', fontWeight: 900 }}>1. CONTENIDO</h4>
+              <h4 style={{ margin: 0, color: '#64748b', fontSize: '11px', fontWeight: 900 }}>1. CONTEÚDO</h4>
               <RichTextEditor value={tempBrief} onChange={setTempBrief} />
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', overflowY: 'auto', paddingRight: '10px' }}>
-              <h4 style={{ margin: 0, color: '#64748b', fontSize: '11px', fontWeight: 900 }}>2. DIMENSIONES DEL VIDEO</h4>
+              <h4 style={{ margin: 0, color: '#64748b', fontSize: '11px', fontWeight: 900 }}>2. DIMENSÕES DO VÍDEO</h4>
               {tempLinks.map((link, lIdx) => (
                 <div key={lIdx} style={{ background: 'white', padding: '15px', borderRadius: '16px', border: '2px solid #f59e0b', marginBottom: '15px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}>
-                  <input type="text" value={link.url} placeholder="Enlace del video..." style={{ width: '100%', padding: '10px', marginBottom: '12px', borderRadius: '10px', border: '1px solid #cbd5e1' }} onChange={(e) => { const nl = [...tempLinks]; nl[lIdx].url = e.target.value; setTempLinks(nl); }} />
+                  <input type="text" value={link.url} placeholder="Link do vídeo..." style={{ width: '100%', padding: '10px', marginBottom: '12px', borderRadius: '10px', border: '1px solid #cbd5e1' }} onChange={(e) => { const nl = [...tempLinks]; nl[lIdx].url = e.target.value; setTempLinks(nl); }} />
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                     <div className="control-group">
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 900, color: '#64748b', marginBottom: '4px' }}><span>ANCHO DEL REPRODUCTOR: {link.width || '600px'}</span></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 900, color: '#64748b', marginBottom: '4px' }}><span>LARGURA DO PLAYER: {link.width || '600px'}</span></div>
                       <input type="range" min="200" max="1200" step="10" value={parseInt(String(link.width || '600').replace(/[^0-9]/g, '')) > 100 ? parseInt(String(link.width || '600').replace(/[^0-9]/g, '')) : 600} style={{ width: '100%', accentColor: '#f59e0b' }} onChange={(e) => { const nl = [...tempLinks]; nl[lIdx].width = `${e.target.value}px`; setTempLinks(nl); }} />
                     </div>
                     <div className="control-group">
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 900, color: '#64748b', marginBottom: '4px' }}><span>ALTURA DEL REPRODUCTOR: {link.height || 300}px</span></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 900, color: '#64748b', marginBottom: '4px' }}><span>ALTURA DO PLAYER: {link.height || 300}px</span></div>
                       <input type="range" min="50" max="1000" step="5" value={link.height || 300} style={{ width: '100%', accentColor: '#f59e0b' }} onChange={(e) => { const nl = [...tempLinks]; nl[lIdx].height = parseInt(e.target.value); setTempLinks(nl); }} />
                     </div>
                     <div className="control-group">
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 900, color: '#64748b', marginBottom: '4px' }}><span>BORDES DEL MARCO: {link.borderRadius !== undefined ? link.borderRadius : 20}px</span></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 900, color: '#64748b', marginBottom: '4px' }}><span>BORDAS DO QUADRO: {link.borderRadius !== undefined ? link.borderRadius : 20}px</span></div>
                       <input type="range" min="0" max="100" step="1" value={link.borderRadius !== undefined ? link.borderRadius : 20} style={{ width: '100%', accentColor: '#f59e0b' }} onChange={(e) => { const nl = [...tempLinks]; nl[lIdx].borderRadius = parseInt(e.target.value); setTempLinks(nl); }} />
                     </div>
                     <div className="control-group">
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 900, color: '#64748b', marginBottom: '4px' }}><span>BORDES DEL REPRODUCTOR: {link.playerBorderRadius !== undefined ? link.playerBorderRadius : (link.borderRadius !== undefined ? link.borderRadius : 20)}px</span></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 900, color: '#64748b', marginBottom: '4px' }}><span>BORDAS DO PLAYER: {link.playerBorderRadius !== undefined ? link.playerBorderRadius : (link.borderRadius !== undefined ? link.borderRadius : 20)}px</span></div>
                       <input type="range" min="0" max="100" step="1" value={link.playerBorderRadius !== undefined ? link.playerBorderRadius : (link.borderRadius !== undefined ? link.borderRadius : 20)} style={{ width: '100%', accentColor: '#f59e0b' }} onChange={(e) => { const nl = [...tempLinks]; nl[lIdx].playerBorderRadius = parseInt(e.target.value); setTempLinks(nl); }} />
                     </div>                          <div className="control-group">
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 900, color: '#64748b', marginBottom: '4px' }}><span>ZOOM DE LA IMAGEN/VIDEO: {link.scale || 1}x</span></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 900, color: '#64748b', marginBottom: '4px' }}><span>ZOOM DA IMAGEM/VÍDEO: {link.scale || 1}x</span></div>
                       <input type="range" min="0.5" max="3" step="0.1" value={link.scale || 1} style={{ width: '100%', accentColor: '#f59e0b' }} onChange={(e) => { const nl = [...tempLinks]; nl[lIdx].scale = parseFloat(e.target.value); setTempLinks(nl); }} />
                     </div>
                     <div className="control-group">
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 900, color: '#64748b', marginBottom: '4px' }}><span>GROSOR DEL MARCO: {link.framePadding || '0px'}</span></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 900, color: '#64748b', marginBottom: '4px' }}><span>ESPESSURA DO QUADRO: {link.framePadding || '0px'}</span></div>
                       <input type="range" min="0" max="50" step="1" value={parseInt(link.framePadding || '0')} style={{ width: '100%', accentColor: '#f59e0b' }} onChange={(e) => { const nl = [...tempLinks]; nl[lIdx].framePadding = `${e.target.value}px`; setTempLinks(nl); }} />
                     </div>
                     <div className="control-group">
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 900, color: '#64748b', marginBottom: '4px' }}><span>COLOR DEL MARCO:</span></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 900, color: '#64748b', marginBottom: '4px' }}><span>COR DO QUADRO:</span></div>
                       <select value={link.frameColor || ''} style={{ width: '100%', padding: '8px', borderRadius: '8px', fontSize: '12px' }} onChange={(e) => { const nl = [...tempLinks]; nl[lIdx].frameColor = e.target.value; setTempLinks(nl); }}>
-                        <option value="">Predeterminado (Negro/Transp.)</option>
-                        <option value="transparent">Transparente (Vacío)</option>
-                        <option value="white">Blanco</option>
+                        <option value="">Padrão (Preto/Transp.)</option>
+                        <option value="transparent">Transparente (Vazio)</option>
+                        <option value="white">Branco</option>
                         <option value="#fef3c7">Beige</option>
-                        <option value="#000000">Negro</option>
-                        <option value="#fbbf24">Amarillo</option>
+                        <option value="#000000">Preto</option>
+                        <option value="#fbbf24">Amarelo</option>
                         <option value="#3b82f6">Azul</option>
                       </select>
                     </div>
                     <div className="control-group">
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 900, color: '#64748b', marginBottom: '4px' }}><span>RETRASO DE INICIO: {link.delay || 0}s</span></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 900, color: '#64748b', marginBottom: '4px' }}><span>ATRASO DE INÍCIO: {link.delay || 0}s</span></div>
                       <input type="range" min="0" max="15" step="0.5" value={link.delay || 0} style={{ width: '100%', accentColor: '#10b981' }} onChange={(e) => { const nl = [...tempLinks]; nl[lIdx].delay = parseFloat(e.target.value); setTempLinks(nl); }} />
                     </div>
 
@@ -431,10 +534,10 @@ const StepNavigation: React.FC<{
                         </select>
                       </div>
                     </div>                       </div>
-                  <button onClick={() => setTempLinks(tempLinks.filter((_, i) => i !== lIdx))} style={{ width: '100%', marginTop: '15px', background: '#fee2e2', color: '#ef4444', border: 'none', padding: '10px', borderRadius: '12px', fontWeight: 900 }}>ELIMINAR</button>
+                  <button onClick={() => setTempLinks(tempLinks.filter((_, i) => i !== lIdx))} style={{ width: '100%', marginTop: '15px', background: '#fee2e2', color: '#ef4444', border: 'none', padding: '10px', borderRadius: '12px', fontWeight: 900 }}>EXCLUIR</button>
                 </div>
               ))}
-              <button onClick={() => setTempLinks([...tempLinks, { label: 'video', url: '', width: '100%', height: 350, objectFit: 'cover' }])} style={{ background: '#f59e0b', color: 'white', border: 'none', padding: '12px', borderRadius: '12px', fontWeight: 900, fontSize: '11px' }}>+ AÑADIR NUEVO VIDEO</button>
+              <button onClick={() => setTempLinks([...tempLinks, { label: 'video', url: '', width: '100%', height: 350, objectFit: 'cover' }])} style={{ background: '#f59e0b', color: 'white', border: 'none', padding: '12px', borderRadius: '12px', fontWeight: 900, fontSize: '11px' }}>+ ADICIONAR NOVO VÍDEO</button>
             </div>
 
             {/* SIMULADOR DINÂMICO */}
@@ -583,7 +686,7 @@ const normalizeEmbedUrl = (rawUrl: string): string => {
   }
 };
 type StepType = 'brief' | 'game' | 'embed' | 'question' | 'report' | 'congratulations';
-type StepContent = { type: StepType; title?: string; mechanic?: string; xp?: number; url?: string; idx?: number; q?: any; brief?: string; mystery_icon?: string; mystery_icon_size?: number; width?: string; height?: number; borderRadius?: number; playerBorderRadius?: number; scale?: number; framePadding?: string; frameColor?: string; };
+type StepContent = { type: StepType; title?: string; title_dari?: string; mechanic?: string; xp?: number; url?: string; idx?: number; q?: any; brief?: string; mystery_icon?: string; mystery_icon_size?: number; width?: string; height?: number; borderRadius?: number; playerBorderRadius?: number; scale?: number; framePadding?: string; frameColor?: string; };
 export const Activities: React.FC<any> = ({ units, ...props }) => {
   const [activeUnitId] = useState<string | null>(props.initialExpandedId || null);
   const activeUnit = useMemo(() => units.find((u: any) => u.id === activeUnitId), [units, activeUnitId]);

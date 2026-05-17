@@ -13,6 +13,44 @@ export const useDariData = () => {
   const [syncStatus, setSyncStatus] = useState<'ok' | 'err'>('ok');
   const { user } = useAuth();
 
+  const handleUnitsSnapshot = useCallback((uSnapshot: any) => {
+    const fetchedUnits = uSnapshot.docs.map((d: any) => ({ id: d.id, ...d.data() } as any));
+    const sanitizedUnits = fetchedUnits.map((u: any) => ({
+      ...u,
+      descriptors: typeof u.descriptors === 'string' ? JSON.parse(u.descriptors) : (u.descriptors || []),
+      embed_urls: typeof u.embed_urls === 'string' ? JSON.parse(u.embed_urls) : (u.embed_urls || []),
+      questions: typeof u.questions === 'string' ? JSON.parse(u.questions) : (u.questions || []),
+      external_links: typeof u.external_links === 'string' ? JSON.parse(u.external_links) : (u.external_links || []),
+      vocabulary_list: typeof u.vocabulary_list === 'string' ? JSON.parse(u.vocabulary_list) : (u.vocabulary_list || []),
+      is_locked: !!u.is_locked
+    }));
+    setUnits(sanitizedUnits);
+  }, []);
+
+  const handleSessionsSnapshot = useCallback((sSnapshot: any) => {
+    const fetchedSessions = sSnapshot.docs.map((d: any) => ({ id: d.id, ...d.data() } as Session));
+    fetchedSessions.sort((a: any, b: any) => new Date(b.session_date).getTime() - new Date(a.session_date).getTime());
+    setSessions(fetchedSessions);
+  }, []);
+
+  const handleAnswersSnapshot = useCallback((aSnapshot: any) => {
+    const aMap: Record<string, Answer> = {};
+    aSnapshot.docs.forEach((d: any) => {
+      const a = d.data() as Answer;
+      aMap[`${a.unit_id}-${a.question_index}`] = a;
+    });
+    setAnswers(aMap);
+  }, []);
+
+  const handleSettingsSnapshot = useCallback((setsSnapshot: any) => {
+    const sMap: Partial<AppSettings> = {};
+    setsSnapshot.docs.forEach((d: any) => {
+      const s = d.data();
+      sMap[s.key as keyof AppSettings] = s.value;
+    });
+    setSettings(sMap);
+  }, []);
+
   const fetchData = useCallback(async () => {
     if (!user) {
       setLoading(false);
@@ -22,48 +60,18 @@ export const useDariData = () => {
       setLoading(true);
       const profileId = user.id;
 
-      // Unidades
-      const qUnits = query(collection(db, 'units'), orderBy('sort_order'));
-      const uSnapshot = await getDocs(qUnits);
-      const fetchedUnits = uSnapshot.docs.map((d: any) => ({ id: d.id, ...d.data() } as any));
+      // Fetch all data in parallel for better performance
+      const [uSnapshot, sSnapshot, aSnapshot, setsSnapshot] = await Promise.all([
+        getDocs(query(collection(db, 'units'), orderBy('sort_order'))),
+        getDocs(query(collection(db, 'sessions'), where('profile_id', '==', profileId))),
+        getDocs(query(collection(db, 'answers'), where('profile_id', '==', profileId))),
+        getDocs(collection(db, 'settings'))
+      ]);
 
-      const sanitizedUnits = fetchedUnits.map((u: any) => ({
-        ...u,
-        descriptors: typeof u.descriptors === 'string' ? JSON.parse(u.descriptors) : (u.descriptors || []),
-        embed_urls: typeof u.embed_urls === 'string' ? JSON.parse(u.embed_urls) : (u.embed_urls || []),
-        questions: typeof u.questions === 'string' ? JSON.parse(u.questions) : (u.questions || []),
-        external_links: typeof u.external_links === 'string' ? JSON.parse(u.external_links) : (u.external_links || []),
-        vocabulary_list: typeof u.vocabulary_list === 'string' ? JSON.parse(u.vocabulary_list) : (u.vocabulary_list || []),
-        is_locked: !!u.is_locked
-      }));
-      setUnits(sanitizedUnits);
-
-      // Sessions
-      const qSessions = query(collection(db, 'sessions'), where('profile_id', '==', profileId));
-      const sSnapshot = await getDocs(qSessions);
-      const fetchedSessions = sSnapshot.docs.map((d: any) => ({ id: d.id, ...d.data() } as Session));
-      // Sort in memory since Firestore requires composite index for where + orderBy
-      fetchedSessions.sort((a: any, b: any) => new Date(b.session_date).getTime() - new Date(a.session_date).getTime());
-      setSessions(fetchedSessions);
-
-      // Answers
-      const qAnswers = query(collection(db, 'answers'), where('profile_id', '==', profileId));
-      const aSnapshot = await getDocs(qAnswers);
-      const aMap: Record<string, Answer> = {};
-      aSnapshot.docs.forEach((d: any) => {
-        const a = d.data() as Answer;
-        aMap[`${a.unit_id}-${a.question_index}`] = a;
-      });
-      setAnswers(aMap);
-
-      // Settings
-      const setsSnapshot = await getDocs(collection(db, 'settings'));
-      const sMap: Partial<AppSettings> = {};
-      setsSnapshot.docs.forEach((d: any) => {
-        const s = d.data();
-        sMap[s.key as keyof AppSettings] = s.value;
-      });
-      setSettings(sMap);
+      handleUnitsSnapshot(uSnapshot);
+      handleSessionsSnapshot(sSnapshot);
+      handleAnswersSnapshot(aSnapshot);
+      handleSettingsSnapshot(setsSnapshot);
 
       setSyncStatus('ok');
     } catch (err) {
@@ -76,16 +84,19 @@ export const useDariData = () => {
 
   useEffect(() => {
     fetchData();
+    // Safety timeout to ensure loading screen doesn't get stuck
+    const timeout = setTimeout(() => setLoading(false), 10000);
+    return () => clearTimeout(timeout);
   }, [fetchData]);
 
   useEffect(() => {
     if (!user) return;
     
     // Set up realtime listeners for Firestore
-    const unsubUnits = onSnapshot(collection(db, 'units'), fetchData, () => setSyncStatus('err'));
-    const unsubSessions = onSnapshot(query(collection(db, 'sessions'), where('profile_id', '==', user.id)), fetchData, () => setSyncStatus('err'));
-    const unsubAnswers = onSnapshot(query(collection(db, 'answers'), where('profile_id', '==', user.id)), fetchData, () => setSyncStatus('err'));
-    const unsubSettings = onSnapshot(collection(db, 'settings'), fetchData, () => setSyncStatus('err'));
+    const unsubUnits = onSnapshot(collection(db, 'units'), handleUnitsSnapshot, () => setSyncStatus('err'));
+    const unsubSessions = onSnapshot(query(collection(db, 'sessions'), where('profile_id', '==', user.id)), handleSessionsSnapshot, () => setSyncStatus('err'));
+    const unsubAnswers = onSnapshot(query(collection(db, 'answers'), where('profile_id', '==', user.id)), handleAnswersSnapshot, () => setSyncStatus('err'));
+    const unsubSettings = onSnapshot(collection(db, 'settings'), handleSettingsSnapshot, () => setSyncStatus('err'));
 
     return () => {
       unsubUnits();
@@ -93,7 +104,7 @@ export const useDariData = () => {
       unsubAnswers();
       unsubSettings();
     };
-  }, [fetchData, user]);
+  }, [handleUnitsSnapshot, handleSessionsSnapshot, handleAnswersSnapshot, handleSettingsSnapshot, user]);
 
   const saveAnswer = useCallback(async (unitId: string, qIdx: number, val: string) => {
     try {
@@ -153,7 +164,7 @@ export const useDariData = () => {
       await Promise.all(deletePromises);
       
       setSyncStatus('ok');
-        // Actualiza estado local eliminando las claves de esta unidad
+        // Atualiza estado local eliminando as chaves desta unidade
         setAnswers(prev => {
           const next = { ...prev };
           Object.keys(next).forEach(key => {
@@ -202,16 +213,16 @@ export const useDariData = () => {
       const newId = `u${Date.now()}`;
       const newUnit: Unit = {
         id: newId,
-        title: title || 'Nueva Unidad',
-        sub: 'Nueva clase · 10 min',
+        title: title || 'Nova Unidade',
+        sub: 'Nova aula · 10 min',
         color: 'emerald',
         sort_order: units.length,
-        brief: 'Directrices para mediación pedagógica enfocada en el desarrollo de la autonomía y competencia lingüística...',
-        plan_c: 'Lengua Inglesa: Estudio del léxico, estructuras gramaticales en contextos significativos y prácticas de multialfabetización.',
-        plan_h: 'Movilizar conocimientos previos para la comprensión de textos orales y escritos, desarrollando estrategias de lectura y producción textual adaptadas al contexto domiciliario.',
-        plan_e: 'Metodologías activas con soporte de TIC (Tecnologías de Información y Comunicación), mediación individualizada, recursos gamificados (Wordwall) y videos instruccionales.',
-        plan_a: 'Formativa y continua: registros en diario de clase, observación del compromiso en las plataformas interactivas y evolución en la resolución de problemas lingüísticos.',
-        wa: '¡Hola! Vamos a iniciar una nueva jornada de aprendizaje hoy...',
+        brief: 'Diretrizes para mediação pedagógica focada no desenvolvimento da autonomia e competência linguística...',
+        plan_c: 'Língua Inglesa: Estudo do léxico, estruturas gramaticais em contextos significativos e práticas de multiletramento.',
+        plan_h: 'Mobilizar conhecimentos prévios para a compreensão de textos orais e escritos, desenvolvendo estratégias de leitura e produção textual.',
+        plan_e: 'Metodologias ativas com suporte de TIC, mediação individualizada, recursos gamificados (Wordwall) e vídeos instrucionais.',
+        plan_a: 'Formativa e contínua: registros em diário de classe, observação do engajamento e evolução na resolução de problemas.',
+        wa: 'Olá! Vamos iniciar uma nova jornada de aprendizagem hoje...',
         embed_urls: [],
         descriptors: [],
         questions: [],

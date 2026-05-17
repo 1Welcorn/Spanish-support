@@ -26,6 +26,9 @@ export interface Question {
 export interface ExternalLink {
   label: string;
   url: string;
+  url_afghan?: string;
+  url_spanish?: string;
+  url_sareh?: string;
   width?: string;
   height?: number;
   objectFit?: string;
@@ -44,6 +47,9 @@ export interface ExternalLink {
 
 export interface EmbedActivity {
   url: string;
+  url_afghan?: string;
+  url_spanish?: string;
+  url_sareh?: string;
   title?: string;
   width?: string;
   thumbnailUrl?: string;
@@ -90,6 +96,8 @@ export interface Unit {
   methodology?: string;
   is_locked?: boolean;
   title_dari?: string;
+  title_spanish?: string;
+  title_sareh?: string;
   mystery_icon?: string;
   mystery_icon_size?: number;
 }
@@ -130,5 +138,9 @@ export interface Lesson {
   icon3D: string;      // Caminho para a imagem colorida
   xpValue: number;
   titleDari?: string;
+  titlePT?: string;
+  titleEN?: string;
+  titleSpanish?: string;
+  titleSareh?: string;
   sub?: string;
 }

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import type { Unit, Question, EmbedActivity, Session } from '../../types';
 import { Printer, Save, CheckCircle, Trash2, Plus, Lock, Unlock, ClipboardList, RotateCcw } from 'lucide-react';
-import { COLORS } from '../../constants';
+import { COLORS } from '../../constants/index';
 import { QuestionBlock } from './QuestionBlock';
 
 interface PlanningProps {
@@ -13,6 +13,7 @@ interface PlanningProps {
   onEditDetails: (id: string) => void;
   onSaveSession: (unitId: string, note: string) => Promise<boolean>;
   onResetProgress: (id: string) => Promise<boolean>;
+  onImportDefaults?: () => Promise<void>;
 }
 
 const AdminUnitResourceRow: React.FC<{ 
@@ -43,29 +44,45 @@ const AdminUnitResourceRow: React.FC<{
   return (
     <div className="admin-unit-card-simple" style={{ background: 'white', borderRadius: '16px', border: '1px solid #f1f5f9', marginBottom: '12px', overflow: 'hidden' }}>
       <div className="admin-unit-header-simple" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div className="unit-dot" style={{ width: '12px', height: '12px', borderRadius: '50%', background: COLORS[unit.color]?.main || COLORS.emerald?.main || '#10b981' }}></div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <span style={{ fontSize: '10px', fontWeight: 900, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Clase / Unidad</span>
-            <strong style={{ fontSize: '15px', color: '#1e293b' }}>{unit.title}</strong>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
+          <div className="unit-dot" style={{ 
+            width: '12px', 
+            height: '12px', 
+            borderRadius: '50%', 
+            background: COLORS[unit.color]?.main || COLORS.emerald?.main || '#10b981',
+            boxShadow: `0 0 10px ${COLORS[unit.color]?.main || '#10b981'}44`
+          }}></div>
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+            <span style={{ fontSize: '10px', fontWeight: 900, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Aula / Unidade</span>
+            <strong style={{ fontSize: '14px', color: '#1e293b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{unit.title}</strong>
           </div>
         </div>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '6px', 
+          background: '#f8fafc', 
+          padding: '4px', 
+          borderRadius: '14px',
+          border: '1px solid #f1f5f9'
+        }}>
           <button 
             onClick={async (e) => {
               e.stopPropagation();
-              if (window.confirm(`¿Estás seguro de que deseas reiniciar el progreso (borrar respuestas) SOLO de la unidad "${unit.title}"? Esto no afecta los informes.`)) {
+              if (window.confirm(`Tem certeza de que deseja reiniciar o progresso (apagar respostas) APENAS da unidade "${unit.title}"? Isso não afeta os relatórios.`)) {
                 await onResetProgress(unit.id);
-                alert('¡Progreso reiniciado con éxito!');
+                alert('Progresso reiniciado com sucesso!');
               }
             }}
-            title="Reiniciar Progreso del Alumno en esta unidad"
+            title="Reiniciar Progresso"
+            className="admin-mini-btn reset"
             style={{
-              padding: '10px',
-              borderRadius: '12px',
-              border: '1px solid #fecaca',
-              background: '#fef2f2',
+              width: '32px',
+              height: '32px',
+              borderRadius: '10px',
+              border: 'none',
+              background: 'transparent',
               color: '#ef4444',
               cursor: 'pointer',
               display: 'flex',
@@ -74,19 +91,21 @@ const AdminUnitResourceRow: React.FC<{
               transition: 'all 0.2s'
             }}
           >
-            <RotateCcw size={18} />
+            <RotateCcw size={16} />
           </button>
 
           <button 
             onClick={() => setShowReports(!showReports)}
-            className={`admin-report-btn ${showReports ? 'active' : ''}`}
-            title="Ver Informes del Mediador"
+            className={`admin-mini-btn reports ${showReports ? 'active' : ''}`}
+            title="Relatórios"
             style={{
-              padding: '10px',
-              borderRadius: '12px',
-              border: '1px solid #e2e8f0',
-              background: showReports ? '#f0fdfa' : 'white',
+              width: '32px',
+              height: '32px',
+              borderRadius: '10px',
+              border: 'none',
+              background: showReports ? '#fff' : 'transparent',
               color: showReports ? '#10b981' : '#64748b',
+              boxShadow: showReports ? '0 2px 8px rgba(0,0,0,0.05)' : 'none',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -94,55 +113,57 @@ const AdminUnitResourceRow: React.FC<{
               transition: 'all 0.2s'
             }}
           >
-            <ClipboardList size={18} />
+            <ClipboardList size={16} />
           </button>
 
           <button 
-            className={`admin-lock-toggle ${unit.is_locked ? 'locked' : 'unlocked'}`}
+            className={`admin-mini-btn lock ${unit.is_locked ? 'locked' : ''}`}
             onClick={async (e) => {
               e.stopPropagation();
               const newLockedState = !unit.is_locked;
               const result = await onSave(unit.id, { is_locked: newLockedState });
               if (!result.success) {
-                alert('Error al ' + (newLockedState ? 'bloquear' : 'desbloquear') + ' unidad: ' + (result.error || 'Error desconocido.'));
+                alert('Erro ao ' + (newLockedState ? 'bloquear' : 'desbloquear') + ' unidade: ' + (result.error || 'Erro desconhecido.'));
               }
             }}
+            title={unit.is_locked ? "Desbloquear" : "Bloquear"}
             style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '10px',
+              border: 'none',
+              background: unit.is_locked ? '#fff' : 'transparent',
+              color: unit.is_locked ? '#f43f5e' : '#64748b',
+              boxShadow: unit.is_locked ? '0 2px 8px rgba(0,0,0,0.05)' : 'none',
+              cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
-              fontSize: '11px',
-              fontWeight: '800',
-              padding: '8px 14px',
-              borderRadius: '10px',
-              background: unit.is_locked ? '#fee2e2' : '#f8fafc',
-              color: unit.is_locked ? '#ef4444' : '#64748b',
-              border: '1px solid',
-              borderColor: unit.is_locked ? '#fecaca' : '#e2e8f0',
-              cursor: 'pointer'
+              justifyContent: 'center',
+              transition: 'all 0.2s'
             }}
           >
-            {unit.is_locked ? <Lock size={14} /> : <Unlock size={14} />}
+            {unit.is_locked ? <Lock size={16} /> : <Unlock size={16} />}
           </button>
           
           <button 
             className="admin-edit-details-btn-premium" 
             onClick={() => onEditDetails(unit.id)}
             style={{ 
-              fontSize: '11px', 
+              fontSize: '10px', 
               fontWeight: '900', 
-              padding: '10px 20px', 
-              borderRadius: '12px', 
+              padding: '0 12px', 
+              height: '32px',
+              borderRadius: '10px', 
               background: '#1e293b', 
               color: 'white',
               border: 'none',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px'
+              gap: '6px'
             }}
           >
-            ADMINISTRAR ⚙️
+            ADMINISTRAR
           </button>
         </div>
       </div>
@@ -150,10 +171,10 @@ const AdminUnitResourceRow: React.FC<{
       {showReports && (
         <div className="unit-reports-panel" style={{ padding: '0 16px 16px', borderTop: '1px solid #f8fafc' }}>
            <div className="reports-history" style={{ marginTop: '16px' }}>
-              <h4 style={{ fontSize: '11px', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '12px' }}>Historial de Informes</h4>
+              <h4 style={{ fontSize: '11px', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '12px' }}>Histórico de Relatórios</h4>
               {unitSessions.length === 0 ? (
                  <div style={{ padding: '20px', textAlign: 'center', color: '#cbd5e1', fontSize: '13px', background: '#f8fafc', borderRadius: '12px', marginBottom: '15px' }}>
-                    Ningún informe registrado aún.
+                    Nenhum relatório registrado ainda.
                  </div>
               ) : (
                  <div className="sessions-list" style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '15px' }}>
@@ -161,7 +182,7 @@ const AdminUnitResourceRow: React.FC<{
                        <div key={s.id} style={{ padding: '12px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #f1f5f9' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
                              <span style={{ fontSize: '10px', fontWeight: 800, color: '#10b981' }}>{s.session_date}</span>
-                             <span style={{ fontSize: '9px', color: '#94a3b8' }}>Profesor Mediador</span>
+                             <span style={{ fontSize: '9px', color: '#94a3b8' }}>Professor Mediador</span>
                           </div>
                           <p style={{ fontSize: '13px', color: '#475569', margin: 0, whiteSpace: 'pre-wrap' }}>{s.note}</p>
                        </div>
@@ -212,7 +233,7 @@ const AdminUnitResourceRow: React.FC<{
   );
 };
 
-export const Planning: React.FC<PlanningProps> = ({ units, sessions, isAdmin, settings, onUpdateUnit, onEditDetails, onSaveSession, onResetProgress }) => {
+export const Planning: React.FC<PlanningProps> = ({ units, sessions, isAdmin, settings, onUpdateUnit, onEditDetails, onSaveSession, onResetProgress, onImportDefaults }) => {
   const handlePrint = () => {
     window.print();
   };
@@ -228,8 +249,8 @@ export const Planning: React.FC<PlanningProps> = ({ units, sessions, isAdmin, se
   return (
     <div className="screen">
       <div className="plan-header-card no-print">
-        <strong>Generador de Plan Oficial</strong><br />
-        Configura el PTD y expórtalo en el formato estándar de la escuela.
+        <strong>Gerador de Plano Oficial</strong><br />
+        Configure o PTD e exporte-o no formato padrão da escola.
       </div>
 
       <div className="plan-table-wrap">
@@ -241,7 +262,7 @@ export const Planning: React.FC<PlanningProps> = ({ units, sessions, isAdmin, se
             </div>
           </div>
           
-          <h2 className="doc-title">PLAN DE TRABAJO DOCENTE - Proyecto Puentes de Esperanza</h2>
+          <h2 className="doc-title">PLANO DE TRABALHO DOCENTE - Projeto Pontes da Esperança</h2>
           
           <table className="meta-table">
             <tbody>
@@ -271,10 +292,10 @@ export const Planning: React.FC<PlanningProps> = ({ units, sessions, isAdmin, se
         <table className="plan-table official">
           <thead>
             <tr>
-              <th><u>Contenidos</u></th>
-              <th><u>Habilidades/Objetivos de aprendizaje</u></th>
-              <th><u>Orientaciones metodológicas y recursos didácticos</u></th>
-              <th><u>Criterios/instrumentos de evaluación</u></th>
+              <th><u>Conteúdos</u></th>
+              <th><u>Habilidades/Objetivos de aprendizagem</u></th>
+              <th><u>Orientações metodológicas e recursos didáticos</u></th>
+              <th><u>Critérios/instrumentos de avaliação</u></th>
             </tr>
           </thead>
           <tbody>
@@ -354,6 +375,22 @@ export const Planning: React.FC<PlanningProps> = ({ units, sessions, isAdmin, se
         <button className="export-btn" onClick={handlePrint}>
           <Printer size={18} /> Imprimir / Generar PDF del Plan
         </button>
+        {isAdmin && (
+          <button 
+            className="secondary-btn" 
+            onClick={async () => {
+              if (window.confirm('Isso irá restaurar as aulas padrão que estão faltando ou desatualizadas no banco de dados. Continuar?')) {
+                if (onImportDefaults) {
+                  await onImportDefaults();
+                  alert('Aulas sincronizadas com sucesso!');
+                }
+              }
+            }}
+            style={{ padding: '10px 20px', borderRadius: '12px' }}
+          >
+            🔄 Sincronizar Aulas Padrão
+          </button>
+        )}
       </div>
 
       <style>{`

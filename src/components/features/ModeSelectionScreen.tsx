@@ -1,7 +1,9 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import type { ProjectMode } from '../../context/AuthContext';
-import { Globe, Sparkles } from 'lucide-react';
+import spanishEmblem from '../../assets/Spanish cartoon emblem.png';
+import tulipIcon from '../../assets/tulip icon.png';
+import sarehEmblem from '../../assets/sareh emblem.png';
 
 export const ModeSelectionScreen: React.FC = () => {
   const { setProjectMode } = useAuth();
@@ -27,20 +29,21 @@ export const ModeSelectionScreen: React.FC = () => {
         animation: 'fadeInDown 0.8s ease-out'
       }}>
         <h1 style={{
-          fontSize: '3rem',
+          fontSize: '3.5rem',
           fontWeight: 900,
           color: '#0f172a',
           marginBottom: '10px',
-          letterSpacing: '-1px'
+          letterSpacing: '-2px',
+          fontFamily: "'Fraunces', serif"
         }}>
-          Proyecto Puentes de Esperanza
+          Projeto Pontes da Esperança
         </h1>
         <p style={{
           fontSize: '1.2rem',
           color: '#64748b',
-          fontWeight: 500
+          fontWeight: 600
         }}>
-          Selecciona tu comunidad de aprendizaje
+          Selecione sua comunidade de aprendizagem
         </p>
       </div>
 
@@ -49,114 +52,165 @@ export const ModeSelectionScreen: React.FC = () => {
         gap: '40px',
         flexWrap: 'wrap',
         justifyContent: 'center',
-        maxWidth: '1000px',
+        maxWidth: '1200px',
         width: '100%'
       }}>
         {/* Afghan Community Card */}
-        <button 
+        <button
           onClick={() => handleSelect('afghan')}
           className="mode-card"
           style={{
-            background: 'rgba(255, 255, 255, 0.7)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.3)',
-            borderRadius: '40px',
+            background: '#ffffff',
+            border: '1px solid #f1f5f9',
+            borderRadius: '45px',
             padding: '40px',
-            width: '320px',
+            width: '350px',
             cursor: 'pointer',
             transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.05)',
+            boxShadow: '0 30px 60px -12px rgba(0,0,0,0.1), 0 18px 36px -18px rgba(0,0,0,0.15)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: '20px',
-            outline: 'none'
+            gap: '24px',
+            outline: 'none',
+            position: 'relative',
+            overflow: 'hidden'
           }}
         >
           <div style={{
-            width: '120px',
-            height: '120px',
-            background: 'linear-gradient(45deg, #10b981, #059669)',
-            borderRadius: '35px',
+            width: '220px',
+            height: '220px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: 'white',
-            boxShadow: '0 15px 30px rgba(16, 185, 129, 0.3)'
+            background: 'white',
+            borderRadius: '30px',
+            filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.06))'
           }}>
-            <Globe size={60} />
+            <img src={tulipIcon} style={{ width: '100%', height: '100%', objectFit: 'contain' }} alt="Afghan Emblem" />
           </div>
           <div style={{ textAlign: 'center' }}>
-            <h2 style={{ margin: 0, fontSize: '1.8rem', fontWeight: 900, color: '#0f172a' }}>Pashto & Dari</h2>
-            <p style={{ margin: '5px 0 0', color: '#64748b', fontWeight: 600 }}>Comunidad Afgana</p>
+            <div style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '4px' }}>Comunidade</div>
+            <p style={{ margin: '0', fontSize: '1.8rem', color: '#0f172a', fontWeight: 900 }}>Afegã</p>
           </div>
           <div style={{
             marginTop: '10px',
-            padding: '10px 20px',
-            background: '#ecfdf5',
-            color: '#059669',
-            borderRadius: '20px',
-            fontSize: '0.9rem',
-            fontWeight: 800,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
+            padding: '12px 40px',
+            background: '#10b981',
+            color: 'white',
+            borderRadius: '25px',
+            fontSize: '1rem',
+            fontWeight: 900,
+            textAlign: 'center',
+            boxShadow: '0 10px 20px rgba(16, 185, 129, 0.3)'
           }}>
-            <Sparkles size={16} /> ENTRAR
+            ENTRAR
           </div>
         </button>
 
         {/* Spanish Community Card */}
-        <button 
+        <button
           onClick={() => handleSelect('spanish')}
           className="mode-card"
           style={{
-            background: 'rgba(255, 255, 255, 0.7)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.3)',
-            borderRadius: '40px',
+            background: '#ffffff',
+            border: '1px solid #f1f5f9',
+            borderRadius: '45px',
             padding: '40px',
-            width: '320px',
+            width: '350px',
             cursor: 'pointer',
             transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.05)',
+            boxShadow: '0 30px 60px -12px rgba(0,0,0,0.1), 0 18px 36px -18px rgba(0,0,0,0.15)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: '20px',
-            outline: 'none'
+            gap: '24px',
+            outline: 'none',
+            position: 'relative',
+            overflow: 'hidden'
           }}
         >
           <div style={{
-            width: '120px',
-            height: '120px',
-            background: 'linear-gradient(45deg, #ef4444, #f59e0b)',
-            borderRadius: '35px',
+            width: '220px',
+            height: '220px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: 'white',
-            boxShadow: '0 15px 30px rgba(239, 68, 68, 0.3)'
+            background: 'white',
+            borderRadius: '30px',
+            filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.06))'
           }}>
-            <Globe size={60} />
+            <img src={spanishEmblem} style={{ width: '100%', height: '100%', objectFit: 'contain', transform: 'scale(1.4)' }} alt="Spanish Emblem" />
           </div>
           <div style={{ textAlign: 'center' }}>
-            <h2 style={{ margin: 0, fontSize: '1.8rem', fontWeight: 900, color: '#0f172a' }}>Español</h2>
-            <p style={{ margin: '5px 0 0', color: '#64748b', fontWeight: 600 }}>Comunidad Hispana</p>
+            <div style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '4px' }}>Comunidade</div>
+            <p style={{ margin: '0', fontSize: '1.8rem', color: '#0f172a', fontWeight: 900 }}>Hispana</p>
           </div>
           <div style={{
             marginTop: '10px',
-            padding: '10px 20px',
-            background: '#fff7ed',
-            color: '#c2410c',
-            borderRadius: '20px',
-            fontSize: '0.9rem',
-            fontWeight: 800,
+            padding: '12px 40px',
+            background: 'linear-gradient(45deg, #ef4444, #f59e0b)',
+            color: 'white',
+            borderRadius: '25px',
+            fontSize: '1rem',
+            fontWeight: 900,
+            textAlign: 'center',
+            boxShadow: '0 10px 20px rgba(239, 68, 68, 0.3)'
+          }}>
+            ENTRAR
+          </div>
+        </button>
+
+        {/* SAREH Community Card */}
+        <button
+          onClick={() => handleSelect('sareh')}
+          className="mode-card"
+          style={{
+            background: '#ffffff',
+            border: '1px solid #f1f5f9',
+            borderRadius: '45px',
+            padding: '40px',
+            width: '350px',
+            cursor: 'pointer',
+            transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+            boxShadow: '0 30px 60px -12px rgba(0,0,0,0.1), 0 18px 36px -18px rgba(0,0,0,0.15)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '24px',
+            outline: 'none',
+            position: 'relative',
+            overflow: 'hidden'
+          }}
+        >
+          <div style={{
+            width: '220px',
+            height: '220px',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px'
+            justifyContent: 'center',
+            background: 'white',
+            borderRadius: '30px',
+            filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.06))'
           }}>
-            <Sparkles size={16} /> ENTRAR
+            <img src={sarehEmblem} style={{ width: '100%', height: '100%', objectFit: 'contain' }} alt="Sareh Emblem" />
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '4px' }}>Comunidade</div>
+            <p style={{ margin: '0', fontSize: '1.8rem', color: '#0f172a', fontWeight: 900 }}>SAREH - Apoio</p>
+          </div>
+          <div style={{
+            marginTop: '10px',
+            padding: '12px 40px',
+            background: 'linear-gradient(45deg, #3b82f6, #1d4ed8)',
+            color: 'white',
+            borderRadius: '25px',
+            fontSize: '1rem',
+            fontWeight: 900,
+            textAlign: 'center',
+            boxShadow: '0 10px 20px rgba(59, 130, 246, 0.3)'
+          }}>
+            ENTRAR
           </div>
         </button>
       </div>

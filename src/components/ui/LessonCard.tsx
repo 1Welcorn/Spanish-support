@@ -2,17 +2,38 @@ import React from 'react';
 import type { Lesson } from '../../types/index';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Lock, Unlock } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 interface LessonCardProps {
   lesson: Lesson;
   onClick?: () => void;
   idx: number;
+  t: any;
 }
 
-export const LessonCard: React.FC<LessonCardProps & { isAdmin?: boolean, onToggleLock?: () => void }> = ({ lesson, onClick, idx, isAdmin, onToggleLock }) => {
+export const LessonCard: React.FC<LessonCardProps & { isAdmin?: boolean, onToggleLock?: () => void }> = ({ lesson, onClick, idx, t, isAdmin, onToggleLock }) => {
+  const { projectMode } = useAuth();
   const isLocked = lesson.status === 'locked';
   const isCurrent = lesson.status === 'not_started';
   const isCompleted = lesson.status === 'completed';
+
+  let mainTitle = lesson.title;
+  let secondaryTitle = lesson.titleDari || '';
+  let tertiaryTitle = '';
+
+  if (projectMode === 'afghan') {
+    mainTitle = lesson.titleDari || lesson.title;
+    secondaryTitle = lesson.titlePT || lesson.title;
+    tertiaryTitle = lesson.titleEN || '';
+  } else if (projectMode === 'spanish') {
+    mainTitle = lesson.title;
+    secondaryTitle = lesson.titlePT || '';
+    tertiaryTitle = lesson.titleEN || '';
+  } else if (projectMode === 'sareh') {
+    mainTitle = lesson.titlePT || lesson.title;
+    secondaryTitle = lesson.titleEN || '';
+    tertiaryTitle = '';
+  }
 
   // Define qual imagem usar baseado no status: 3D para Concluído ou Atual, Outline apenas para Bloqueado
   const getIcon3D = () => {
@@ -73,7 +94,7 @@ export const LessonCard: React.FC<LessonCardProps & { isAdmin?: boolean, onToggl
           border: isCurrent ? '3px solid #FF8DA1' : '3px solid white',
           borderRadius: '21px',
           padding: '16px 14px',
-          minHeight: '220px',
+          minHeight: '260px',
           boxShadow: isCurrent ? '0 6px 0px #E56A81' : '0 5px 0px rgba(0,0,0,0.05)',
           display: 'flex',
           flexDirection: 'column',
@@ -84,7 +105,7 @@ export const LessonCard: React.FC<LessonCardProps & { isAdmin?: boolean, onToggl
       >
         {isCompleted && (
           <div className="lesson-ribbon-v5" style={{ background: 'var(--sage)', color: 'white', fontSize: '8px' }}>
-            ¡Completado!
+            {t.lesson_completed || 'Concluído!'}
           </div>
         )}
 
@@ -96,8 +117,8 @@ export const LessonCard: React.FC<LessonCardProps & { isAdmin?: boolean, onToggl
                 alt={lesson.title}
                 className={isCompleted ? 'animate-pop' : ''}
                 style={{ 
-                  width: '108px', 
-                  height: '108px', 
+                  width: '140px', 
+                  height: '140px', 
                   objectFit: 'contain' 
                 }}
                 onError={(e) => {
@@ -122,31 +143,42 @@ export const LessonCard: React.FC<LessonCardProps & { isAdmin?: boolean, onToggl
             boxShadow: '0 4px 10px rgba(216, 180, 216, 0.4)',
             whiteSpace: 'nowrap'
           }}>
-            {lesson.sub || `CLASE ${idx + 1}`}
+            {lesson.sub || `AULA ${idx + 1}`}
           </span>
         </div>
         
         <div className="lesson-info-v5" style={{ textAlign: 'center', width: '100%' }}>
-
             <h3 className="lesson-title-v5" style={{ 
-            fontSize: '14px', 
+            fontSize: projectMode === 'afghan' ? '20px' : '14px', 
             color: 'var(--ink1)', 
             fontWeight: 900, 
             margin: '0',
-            fontFamily: 'Fraunces, serif'
+            fontFamily: projectMode === 'afghan' ? 'Outfit, sans-serif' : 'Fraunces, serif',
+            direction: projectMode === 'afghan' ? 'rtl' : 'ltr'
           }}>
-            {lesson.title}
+            {mainTitle || lesson.title || 'Carregando Aula...'}
           </h3>
-          {lesson.titleDari && (
+          {secondaryTitle && (
             <div style={{ 
-              fontSize: '18px', 
-              fontWeight: 900, 
-              color: 'var(--ink1)',
+              fontSize: '12px', 
+              fontWeight: 700, 
+              color: 'var(--ink4)',
               lineHeight: 1.1,
-              fontFamily: 'Outfit, sans-serif',
-              marginTop: '0px'
+              marginTop: '4px'
             }}>
-              {lesson.titleDari}
+              {secondaryTitle}
+            </div>
+          )}
+          {tertiaryTitle && (
+            <div style={{ 
+              fontSize: '11px', 
+              fontWeight: 600, 
+              color: 'var(--ink3)',
+              lineHeight: 1.1,
+              marginTop: '2px',
+              fontStyle: 'italic'
+            }}>
+              {tertiaryTitle}
             </div>
           )}
         </div>
@@ -182,8 +214,8 @@ export const LessonCard: React.FC<LessonCardProps & { isAdmin?: boolean, onToggl
             minHeight: 'auto',
             borderWidth: '2px'
           }}>
-            <span style={{ fontSize: '12px', fontWeight: 900, lineHeight: 1 }}>¡Empezar Ahora!</span>
-            <span style={{ fontSize: '8px', fontWeight: 700, opacity: 0.9 }}>(Start Now!)</span>
+            <span style={{ fontSize: '12px', fontWeight: 900, lineHeight: 1 }}>{t.start_now || 'Começar Agora!'}</span>
+            <span style={{ fontSize: '8px', fontWeight: 700, opacity: 0.9 }}>{t.start_now_en || '(Start Now!)'}</span>
           </button>
         )}
       </motion.div>

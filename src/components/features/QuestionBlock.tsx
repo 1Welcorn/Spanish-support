@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { Question, QuestionType } from '../../types';
-import { COLORS } from '../../constants';
+import { COLORS } from '../../constants/index';
 import { Info, CheckCircle, Volume2, Edit2, Trash2, Check, Circle, Music, Plus } from 'lucide-react';
 import { speechService } from '../../utils/speech';
 import { VideoPlayerV5 } from './Activities';

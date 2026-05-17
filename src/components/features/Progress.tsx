@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Unit, Session } from '../../types';
-import { COLORS } from '../../constants';
+import { COLORS } from '../../constants/index';
 import { FileText, Calendar, CheckCircle2, Clock, RotateCcw, Edit2, Trash2, Save, X } from 'lucide-react';
 
 interface ProgressProps {

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { UserRole } from '../types';
-export type ProjectMode = 'afghan' | 'spanish';
+export type ProjectMode = 'afghan' | 'spanish' | 'sareh';
 import { auth, db } from '../services/firebase';
 import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -36,10 +36,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const ADMIN_EMAILS = ['willians.souza@escola.pr.gov.br', 'f4330252301@gmail.com']; 
 const MEDIATOR_EMAILS: string[] = []; 
 
-const CUSTOM_STUDENTS = [
-  { name: 'ASMA QARI ZADAH', pin: 'asma', email: 'asma@pontes.com' },
-  { name: 'HOSNA QARI ZADAH', pin: 'hosna', email: 'hosna@pontes.com' },
-  { name: 'Ione Jordão Ribeiro', pin: 'ione', email: 'ione@pontes.com' }
+export const CUSTOM_STUDENTS = [
+  { name: 'ASMA QARI ZADAH', pin: 'asma', email: 'asma.zadah@escola.pr.gov.br', mode: 'afghan' },
+  { name: 'HOSNA QARI ZADAH', pin: 'hosna', email: 'hosna.zadah@escola.pr.gov.br', mode: 'afghan' },
+  { name: 'IONE JORDÃO RIBEIRO', pin: 'ione', email: 'ione.ribeiro@escola.pr.gov.br', mode: 'sareh' }
 ];
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -83,17 +83,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log("AuthContext: Handling user:", firebaseUser?.email);
     
     if (firebaseUser) {
-      // 1. Fetch profile from Firestore to check for automatic direction
-      let autoMode: ProjectMode | null = null;
-      try {
-        const profileSnap = await getDoc(doc(db, 'profiles', firebaseUser.uid));
-        if (profileSnap.exists()) {
-          autoMode = profileSnap.data().project_mode as ProjectMode;
-        }
-      } catch (err) {
-        console.error("Error fetching profile mode:", err);
-      }
-
+      // 1. Set User Basic Data
       const normalizedUser: AppUser = {
         id: firebaseUser.uid,
         uid: firebaseUser.uid,
@@ -107,28 +97,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
       setUser(normalizedUser);
 
-      // 2. Set project mode (Priority: 1. Firestore, 2. LocalStorage)
-      if (autoMode) {
-        setProjectMode(autoMode);
-        localStorage.setItem('dari_project_mode', autoMode);
-      } else {
-        const savedMode = localStorage.getItem('dari_project_mode') as ProjectMode;
-        if (savedMode) setProjectMode(savedMode);
-      }
-
+      // 2. Identify Role and Auto-Mode
       if (firebaseUser.email) {
-        if (ADMIN_EMAILS.includes(firebaseUser.email)) {
-          console.log("AuthContext: User is ADMIN");
+        const email = firebaseUser.email.toLowerCase();
+        console.log("AuthContext: Validating role for email:", email);
+        
+        // Is it an Admin?
+        if (ADMIN_EMAILS.includes(email)) {
+          console.log("AuthContext: ROLE SET TO ADMIN");
           setRole('admin');
           localStorage.setItem('dari_role', 'admin');
-        } else if (MEDIATOR_EMAILS.includes(firebaseUser.email)) {
-          console.log("AuthContext: User is MEDIATOR");
-          setRole('mediator');
-          localStorage.setItem('dari_role', 'mediator');
-        } else {
-          console.log("AuthContext: User is STUDENT (default)");
-          setRole('student');
-          localStorage.setItem('dari_role', 'student');
+          const savedMode = localStorage.getItem('dari_project_mode') as ProjectMode;
+          if (savedMode) setProjectMode(savedMode);
+        } 
+        // Is it a Mediator?
+        else if (MEDIATOR_EMAILS.includes(email)) {
+          console.log("AuthContext: ROLE SET TO MEDIATOR");
+          setRole('admin'); // Temporário para garantir acesso total se necessário
+          localStorage.setItem('dari_role', 'admin');
+        } 
+        // Is it a known Student?
+        else {
+          const studentProfile = CUSTOM_STUDENTS.find(s => s.email.toLowerCase() === email);
+          
+          if (studentProfile) {
+            console.log("AuthContext: Recognized Student:", studentProfile.name);
+            setRole('student');
+            setProjectMode(studentProfile.mode as ProjectMode);
+            localStorage.setItem('dari_role', 'student');
+            localStorage.setItem('dari_project_mode', studentProfile.mode);
+          } else {
+            console.log("AuthContext: Unknown user, defaulting to student");
+            setRole('student');
+            localStorage.setItem('dari_role', 'student');
+          }
         }
       }
     } else {
@@ -155,8 +157,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const student = CUSTOM_STUDENTS.find(s => s.name.toUpperCase() === name.toUpperCase() && s.pin.toLowerCase() === pin.toLowerCase());
     
     if (student) {
-      // Determine mode based on student name or custom logic
-      const mode: ProjectMode = name.toUpperCase().includes('ASMA') || name.toUpperCase().includes('HOSNA') ? 'afghan' : 'spanish';
+      // Determine mode based on student profile or name
+      let mode: ProjectMode = student.mode as ProjectMode;
+      
+      // Fallback for students without explicit mode in profile
+      if (!mode) {
+        mode = name.toUpperCase().includes('ASMA') || name.toUpperCase().includes('HOSNA') ? 'afghan' : 'spanish';
+      }
       
       const mockUser: AppUser = {
         id: `mock-${student.name.replace(/\s+/g, '-').toLowerCase()}`,
@@ -199,8 +206,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     setRole(null);
     setUser(null);
+    setProjectMode(null);
     localStorage.removeItem('dari_role');
     localStorage.removeItem('dari_mock_user');
+    localStorage.removeItem('dari_project_mode');
   };
 
   return (
