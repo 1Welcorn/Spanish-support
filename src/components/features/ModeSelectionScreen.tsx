@@ -77,7 +77,7 @@ export const ModeSelectionScreen: React.FC = () => {
             overflow: 'hidden'
           }}
         >
-          <div style={{
+            <div style={{
             width: '220px',
             height: '220px',
             display: 'flex',
@@ -87,7 +87,7 @@ export const ModeSelectionScreen: React.FC = () => {
             borderRadius: '30px',
             filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.06))'
           }}>
-            <img src={tulipIcon} style={{ width: '100%', height: '100%', objectFit: 'contain' }} alt="Afghan Emblem" />
+            <img src={tulipIcon} style={{ width: '160px', height: '160px', objectFit: 'contain' }} alt="Afghan Emblem" />
           </div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '4px' }}>Comunidade</div>
@@ -130,7 +130,7 @@ export const ModeSelectionScreen: React.FC = () => {
             overflow: 'hidden'
           }}
         >
-          <div style={{
+            <div style={{
             width: '220px',
             height: '220px',
             display: 'flex',
@@ -140,7 +140,7 @@ export const ModeSelectionScreen: React.FC = () => {
             borderRadius: '30px',
             filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.06))'
           }}>
-            <img src={spanishEmblem} style={{ width: '100%', height: '100%', objectFit: 'contain', transform: 'scale(1.4)' }} alt="Spanish Emblem" />
+            <img src={spanishEmblem} style={{ width: '160px', height: '160px', objectFit: 'contain' }} alt="Spanish Emblem" />
           </div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '4px' }}>Comunidade</div>
@@ -183,7 +183,7 @@ export const ModeSelectionScreen: React.FC = () => {
             overflow: 'hidden'
           }}
         >
-          <div style={{
+            <div style={{
             width: '220px',
             height: '220px',
             display: 'flex',
@@ -193,7 +193,7 @@ export const ModeSelectionScreen: React.FC = () => {
             borderRadius: '30px',
             filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.06))'
           }}>
-            <img src={sarehEmblem} style={{ width: '100%', height: '100%', objectFit: 'contain' }} alt="Sareh Emblem" />
+            <img src={sarehEmblem} style={{ width: '160px', height: '160px', objectFit: 'contain' }} alt="Sareh Emblem" />
           </div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '4px' }}>Comunidade</div>
