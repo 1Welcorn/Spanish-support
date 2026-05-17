@@ -25,6 +25,7 @@ export const useDariData = () => {
       is_locked: !!u.is_locked
     }));
     setUnits(sanitizedUnits);
+    setLoading(false);
   }, []);
 
   const handleSessionsSnapshot = useCallback((sSnapshot: any) => {
@@ -83,11 +84,11 @@ export const useDariData = () => {
   }, [user]);
 
   useEffect(() => {
-    fetchData();
-    // Safety timeout to ensure loading screen doesn't get stuck
-    const timeout = setTimeout(() => setLoading(false), 10000);
+    // Rely on realtime onSnapshot for initial load.
+    // Safety timeout to ensure loading screen doesn't get stuck if no internet/error
+    const timeout = setTimeout(() => setLoading(false), 5000);
     return () => clearTimeout(timeout);
-  }, [fetchData]);
+  }, []);
 
   useEffect(() => {
     if (!user) return;
