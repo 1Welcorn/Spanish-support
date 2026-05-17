@@ -27,7 +27,8 @@ export const App: React.FC = () => {
     speechService.preload();
   }, []);
 
-  const { role, user, logout, projectMode, loading: authLoading } = useAuth();
+  const { role: rawRole, user, logout, projectMode, loading: authLoading } = useAuth();
+  const role = rawRole as any;
   const t = useMemo(() => {
     const mode = projectMode || 'spanish';
     const found = translations[mode];
