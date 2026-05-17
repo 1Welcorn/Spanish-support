@@ -744,23 +744,15 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
           from { opacity: 0; transform: translateY(10px); }
           to { opacity: 1; transform: translateY(0); }
         }
-      `}</style>
-
-      {showAssetPicker.active && <AssetPicker onSelect={showAssetPicker.callback} onClose={() => setShowAssetPicker({ active: false, callback: () => {} })} />}
-      <input type="file" ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} accept="image/*" />
-
-      </div>
-
-      {showAssetPicker.active && <AssetPicker onSelect={showAssetPicker.callback} onClose={() => setShowAssetPicker({ active: false, callback: () => {} })} />}
-      <input type="file" ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} accept="image/*" />
-      
-      <style>{`
         @keyframes pulse {
           0% { opacity: 0.6; transform: scale(1); }
           50% { opacity: 1; transform: scale(1.05); }
           100% { opacity: 0.6; transform: scale(1); }
         }
       `}</style>
+
+      {showAssetPicker.active && <AssetPicker onSelect={showAssetPicker.callback} onClose={() => setShowAssetPicker({ active: false, callback: () => {} })} />}
+      <input type="file" ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} accept="image/*" />
     </div>
   );
 };
