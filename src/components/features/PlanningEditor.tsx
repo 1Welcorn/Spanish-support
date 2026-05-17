@@ -75,9 +75,9 @@ const RichTextEditor: React.FC<{ value: string; onChange: (val: string) => void;
 };
 
 const INTERNAL_ASSETS = [
-  { name: 'Ícone Tulipa (Afegã)', path: 'src/assets/tulip icon.png' },
-  { name: 'Emblema Hispano', path: 'src/assets/Spanish cartoon emblem.png' },
-  { name: 'Emblema Sareh', path: 'src/assets/sareh emblem.png' },
+  { name: 'Ícone Tulipa (Afegã)', path: 'src/assets/tulip icon.jpeg' },
+  { name: 'Emblema Hispano', path: 'src/assets/Spanish cartoon emblem.jpeg' },
+  { name: 'Emblema Sareh', path: 'src/assets/sareh emblem.jpeg' },
   { name: 'Robot 3D', path: 'src/assets/robot-3d.png' },
   { name: 'Pan 3D', path: 'src/assets/pan-3d.png' },
   { name: 'Memory Game', path: 'src/assets/memory_game.png' },

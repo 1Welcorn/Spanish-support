@@ -1,9 +1,9 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import type { ProjectMode } from '../../context/AuthContext';
-import spanishEmblem from '../../assets/Spanish cartoon emblem.png';
-import tulipIcon from '../../assets/tulip icon.png';
-import sarehEmblem from '../../assets/sareh emblem.png';
+import spanishEmblem from '../../assets/Spanish cartoon emblem.jpeg';
+import tulipIcon from '../../assets/tulip icon.jpeg';
+import sarehEmblem from '../../assets/sareh emblem.jpeg';
 
 export const ModeSelectionScreen: React.FC = () => {
   const { setProjectMode } = useAuth();

@@ -1,10 +1,10 @@
 import React from 'react';
 import { useAuth, CUSTOM_STUDENTS } from '../../context/AuthContext';
 import { translations } from '../../constants/translations';
-import projectLogo from '../../assets/tulip icon.png';
-import tulipIcon from '../../assets/tulip icon.png';
-import spanishEmblem from '../../assets/Spanish cartoon emblem.png';
-import sarehEmblem from '../../assets/sareh emblem.png';
+import projectLogo from '../../assets/tulip icon.jpeg';
+import tulipIcon from '../../assets/tulip icon.jpeg';
+import spanishEmblem from '../../assets/Spanish cartoon emblem.jpeg';
+import sarehEmblem from '../../assets/sareh emblem.jpeg';
 import { User, Lock, ArrowRight } from 'lucide-react';
 
 const StudentLoginCard: React.FC<{ name: string; t: any }> = ({ name, t }) => {
@@ -183,13 +183,37 @@ export const LoginScreen: React.FC<{ settings: any }> = () => {
           <div className="auth-error-message" style={{
             backgroundColor: '#fee2e2',
             color: '#b91c1c',
-            padding: '12px',
-            borderRadius: '8px',
+            padding: '16px',
+            borderRadius: '12px',
             fontSize: '13px',
             marginBottom: '20px',
-            border: '1px solid #fecaca'
+            border: '1px solid #fecaca',
+            textAlign: 'left',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.02)'
           }}>
-            {authError}
+            <div style={{ fontWeight: 800, marginBottom: '6px', fontSize: '14px' }}>Erro de Autenticação</div>
+            {authError.includes('auth/unauthorized-domain') ? (
+              <div style={{ fontSize: '12px', lineHeight: '1.5', color: '#7f1d1d' }}>
+                <p style={{ margin: '0 0 8px 0' }}>
+                  O domínio atual (<strong>{window.location.hostname}</strong>) não está autorizado para autenticação no Firebase Console do seu projeto.
+                </p>
+                <strong style={{ display: 'block', marginBottom: '4px' }}>Como resolver:</strong>
+                <ol style={{ paddingLeft: '20px', margin: '0 0 8px 0', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <li>Acesse o <a href="https://console.firebase.google.com/" target="_blank" rel="noopener noreferrer" style={{ color: '#b91c1c', fontWeight: 800, textDecoration: 'underline' }}>Firebase Console</a>.</li>
+                  <li>Selecione o projeto <strong>spanish-project-f52fb</strong>.</li>
+                  <li>No menu lateral esquerdo, vá em <strong>Build</strong> &gt; <strong>Authentication</strong>.</li>
+                  <li>Clique na aba <strong>Settings</strong> (Configurações) no topo.</li>
+                  <li>No menu lateral esquerdo da aba Settings, clique em <strong>Authorized domains</strong> (Domínios autorizados).</li>
+                  <li>Clique em <strong>Add domain</strong> (Adicionar domínio) e insira: <code style={{ backgroundColor: 'rgba(0,0,0,0.05)', padding: '2px 4px', borderRadius: '4px', fontWeight: 'bold' }}>{window.location.hostname}</code></li>
+                  <li>Clique em <strong>Add</strong> para salvar.</li>
+                </ol>
+                <p style={{ margin: '0', fontSize: '11px', opacity: 0.8 }}>
+                  Após adicionar o domínio, recarregue esta página e tente fazer o login novamente!
+                </p>
+              </div>
+            ) : (
+              authError
+            )}
           </div>
         )}
 
