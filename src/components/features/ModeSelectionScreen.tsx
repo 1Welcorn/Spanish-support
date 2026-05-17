@@ -4,6 +4,9 @@ import type { ProjectMode } from '../../context/AuthContext';
 import spanishEmblem from '../../assets/Spanish cartoon emblem.jpeg';
 import tulipIcon from '../../assets/tulip icon.jpeg';
 import sarehEmblem from '../../assets/sareh emblem.jpeg';
+import spanishEmblemWebp from '../../assets/Spanish cartoon emblem.webp';
+import tulipIconWebp from '../../assets/tulip icon.webp';
+import sarehEmblemWebp from '../../assets/sareh emblem.webp';
 
 export const ModeSelectionScreen: React.FC = () => {
   const { setProjectMode } = useAuth();
@@ -88,7 +91,7 @@ export const ModeSelectionScreen: React.FC = () => {
               filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.06))'
             }}>
               <picture>
-                <source srcSet={tulipIcon.replace(/\.(jpe?g|png)$/i, '.webp')} type="image/webp" />
+                <source srcSet={tulipIconWebp} type="image/webp" />
                 <img src={tulipIcon} width={160} height={160} decoding="async" loading="lazy" style={{ objectFit: 'contain' }} alt="Afghan Emblem" />
               </picture>
             </div>
@@ -144,7 +147,7 @@ export const ModeSelectionScreen: React.FC = () => {
               filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.06))'
             }}>
               <picture>
-                <source srcSet={spanishEmblem.replace(/\.(jpe?g|png)$/i, '.webp')} type="image/webp" />
+                <source srcSet={spanishEmblemWebp} type="image/webp" />
                 <img src={spanishEmblem} width={160} height={160} decoding="async" loading="lazy" style={{ objectFit: 'contain' }} alt="Spanish Emblem" />
               </picture>
             </div>
@@ -200,7 +203,7 @@ export const ModeSelectionScreen: React.FC = () => {
               filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.06))'
             }}>
               <picture>
-                <source srcSet={sarehEmblem.replace(/\.(jpe?g|png)$/i, '.webp')} type="image/webp" />
+                <source srcSet={sarehEmblemWebp} type="image/webp" />
                 <img src={sarehEmblem} width={160} height={160} decoding="async" loading="lazy" style={{ objectFit: 'contain' }} alt="Sareh Emblem" />
               </picture>
             </div>
