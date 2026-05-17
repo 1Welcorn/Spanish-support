@@ -28,7 +28,7 @@ interface AuthContextType {
   loginWithRole: (role: UserRole) => void;
   logout: () => Promise<void>;
   projectMode: ProjectMode | null;
-  setProjectMode: (mode: ProjectMode) => void;
+  setProjectMode: (mode: ProjectMode | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -193,9 +193,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     else localStorage.removeItem('dari_role');
   };
 
-  const handleSetProjectMode = (mode: ProjectMode) => {
+  const handleSetProjectMode = (mode: ProjectMode | null) => {
     setProjectMode(mode);
-    localStorage.setItem('dari_project_mode', mode);
+    if (mode) {
+      localStorage.setItem('dari_project_mode', mode);
+    } else {
+      localStorage.removeItem('dari_project_mode');
+    }
   };
 
   const logout = async () => {

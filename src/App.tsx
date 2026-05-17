@@ -185,7 +185,7 @@ export const App: React.FC = () => {
         </div>
         <h3 style={{ color: 'var(--ink2)', marginBottom: '10px', fontSize: '24px' }}>{t.no_units}</h3>
         <p style={{ color: 'var(--ink4)', maxWidth: '400px', margin: '0 auto 24px' }}>
-          {syncStatus === 'err' ? 'Erro de conexão com o banco de dados.' : (isAdmin ? t.no_units_desc_admin || 'Você pode começar criando sua primeira aula ou importando os padrões no Planejamento.' : t.no_units_desc)}
+          {syncStatus === 'err' ? 'Erro de conexão com o banco de dados.' : (role === 'admin' ? t.no_units_desc_admin || 'Você pode começar criando sua primeira aula ou importando os padrões no Planejamento.' : t.no_units_desc)}
         </p>
         <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
           <button className="primary-btn" onClick={() => window.location.reload()} style={{ padding: '12px 24px' }}>{t.retry}</button>

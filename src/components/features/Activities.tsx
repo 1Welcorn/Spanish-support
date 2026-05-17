@@ -225,25 +225,25 @@ const StepNavigation: React.FC<{
     titleEN = unit.title_dari || '';
   }
 
-  let mainTitle = unit.title; // Default is Portuguese
+  let mainTitle = unit.title || ''; // Default is Portuguese
   let secondaryTitle = '';
   let tertiaryTitle = unit.title_dari || ''; // English Study
 
   if (projectMode === 'afghan') {
-    mainTitle = titleDari || unit.title_dari; // Dari
-    secondaryTitle = unit.title; // Portuguese (Bridge)
-    tertiaryTitle = titleEN || unit.title_dari; // English
+    mainTitle = titleDari || unit.title_dari || ''; // Dari
+    secondaryTitle = unit.title || ''; // Portuguese (Bridge)
+    tertiaryTitle = titleEN || unit.title_dari || ''; // English
   } else if (projectMode === 'sareh') {
-    mainTitle = unit.title_sareh || titlePT || unit.title; // Prefer localized SAREH title
+    mainTitle = unit.title_sareh || titlePT || unit.title || ''; // Prefer localized SAREH title
     secondaryTitle = '';
-    tertiaryTitle = titleEN || unit.title_dari; // English
+    tertiaryTitle = titleEN || unit.title_dari || ''; // English
   } else if (projectMode === 'spanish') {
     mainTitle = unit.title_spanish || (tStr.includes('cocina') ? 'Nuestra Cocina' : 
                 tStr.includes('colores') ? 'Colores y Frutas' :
                 tStr.includes('familia') ? 'Mi Familia' : 
-                unit.title); // Fallback to logic or PT
-    secondaryTitle = unit.title; // Portuguese (Bridge)
-    tertiaryTitle = titleEN || unit.title_dari; // English
+                unit.title) || ''; // Fallback to logic or PT
+    secondaryTitle = unit.title || ''; // Portuguese (Bridge)
+    tertiaryTitle = titleEN || unit.title_dari || ''; // English
   }
 
   const steps: StepContent[] = [];
