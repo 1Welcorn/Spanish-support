@@ -247,7 +247,10 @@ export const Planning: React.FC<PlanningProps> = ({ units, sessions, isAdmin, se
   }, [units]);
 
   return (
-    <div className="screen">
+    <div className="screen" style={{ position: 'relative' }}>
+      <div style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(0,0,0,0.8)', color: 'white', padding: '5px 10px', borderRadius: '5px', zIndex: 999999, fontSize: '12px', fontWeight: 'bold', pointerEvents: 'none' }}>
+        Screen 6: Planning
+      </div>
       <div className="plan-header-card no-print">
         <strong>Gerador de Plano Oficial</strong><br />
         Configure o PTD e exporte-o no formato padrão da escola.

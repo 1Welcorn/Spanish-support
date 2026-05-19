@@ -1,10 +1,10 @@
 import React from 'react';
 import { useAuth, CUSTOM_STUDENTS } from '../../context/AuthContext';
 import { translations } from '../../constants/translations';
-import projectLogo from '../../assets/tulip icon.jpeg';
-import tulipIcon from '../../assets/tulip icon.jpeg';
-import spanishEmblem from '../../assets/Spanish cartoon emblem.jpeg';
-import sarehEmblem from '../../assets/sareh emblem.jpeg';
+import projectLogo from '../../assets/tulip icon replacement.png';
+import tulipIcon from '../../assets/tulip icon replacement.png';
+import spanishEmblem from '../../assets/spanish icon replacement.png';
+import sarehEmblem from '../../assets/sareh icon replacement.png';
 import { User, Lock, ArrowRight } from 'lucide-react';
 
 const StudentLoginCard: React.FC<{ name: string; t: any }> = ({ name, t }) => {
@@ -112,6 +112,9 @@ export const LoginScreen: React.FC<{ settings: any }> = () => {
 
   return (
     <div id="login-screen">
+      <div style={{ position: 'fixed', top: 10, left: 10, background: 'rgba(0,0,0,0.8)', color: 'white', padding: '5px 10px', borderRadius: '5px', zIndex: 999999, fontSize: '12px', fontWeight: 'bold', pointerEvents: 'none' }}>
+        Screen 2: LoginScreen
+      </div>
       <div className="login-card">
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
           <img src={currentEmblem} alt="Logo" style={{ height: '150px', width: 'auto', maxWidth: '240px', objectFit: 'contain' }} />

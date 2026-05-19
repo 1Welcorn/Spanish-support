@@ -8,9 +8,9 @@ import {
   Maximize, ChevronRight, ChevronLeft, ArrowLeft,
   Eye, Lock, Unlock, X, ClipboardList, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, AlignJustify, List, ListOrdered, Type, Eraser, Palette, Maximize2, Clock, Monitor, Smartphone as MobileIcon, Image as ImageIcon, AlertTriangle, Zap
 } from 'lucide-react';
-import memoryGameImg from '../../assets/memory_game.jpeg';
-import wordGameImg from '../../assets/word_game.jpeg';
-import startButtonDari from '../../assets/botão clique aqui em PersaDari (297 x 210 mm).jpeg';
+import memoryGameImg from '../../assets/memory_game.webp';
+import wordGameImg from '../../assets/word_game.webp';
+import startButtonDari from '../../assets/botão clique aqui em PersaDari (297 x 210 mm).webp';
 import { HomeButton } from '../ui/HomeButton';
 import { QuestionBlock } from './QuestionBlock';
 import EmbedPreview from '../ui/EmbedPreview';
@@ -282,6 +282,9 @@ const StepNavigation: React.FC<{
 
   return (
     <div className={`activities-v5-wrapper step-type-${current.type}`}>
+      <div style={{ position: 'fixed', top: 10, left: 10, background: 'rgba(0,0,0,0.8)', color: 'white', padding: '5px 10px', borderRadius: '5px', zIndex: 999999, fontSize: '12px', fontWeight: 'bold', pointerEvents: 'none' }}>
+        Screen 4: Activities
+      </div>
       <div className="profile-header-image-style" style={{ margin: '4px auto 0' }}>
         <div className="avatar-and-name">
           <h2 style={{ fontSize: '20px', margin: 0, fontWeight: 900 }}>Projeto Pontes da Esperança ☀️</h2>

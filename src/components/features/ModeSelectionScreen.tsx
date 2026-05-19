@@ -1,12 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import type { ProjectMode } from '../../context/AuthContext';
-import spanishEmblem from '../../assets/Spanish cartoon emblem.jpeg';
-import tulipIcon from '../../assets/tulip icon.jpeg';
-import sarehEmblem from '../../assets/sareh emblem.jpeg';
-import spanishEmblemWebp from '../../assets/Spanish cartoon emblem.webp';
-import tulipIconWebp from '../../assets/tulip icon.webp';
-import sarehEmblemWebp from '../../assets/sareh emblem.webp';
+import spanishEmblem from '../../assets/spanish icon replacement.png';
+import tulipIcon from '../../assets/tulip icon replacement.png';
+import sarehEmblem from '../../assets/sareh icon replacement.png';
+// Use JPEG assets only for stability in dev
 
 export const ModeSelectionScreen: React.FC = () => {
   const { setProjectMode } = useAuth();
@@ -26,6 +24,9 @@ export const ModeSelectionScreen: React.FC = () => {
       padding: '20px',
       fontFamily: "'Outfit', sans-serif"
     }}>
+      <div style={{ position: 'fixed', top: 10, left: 10, background: 'rgba(0,0,0,0.8)', color: 'white', padding: '5px 10px', borderRadius: '5px', zIndex: 999999, fontSize: '12px', fontWeight: 'bold', pointerEvents: 'none' }}>
+        Screen 1: ModeSelectionScreen
+      </div>
       <div style={{
         textAlign: 'center',
         marginBottom: '50px',
@@ -86,14 +87,11 @@ export const ModeSelectionScreen: React.FC = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              background: 'white',
+              background: 'transparent',
               borderRadius: '30px',
               filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.06))'
             }}>
-              <picture>
-                <source srcSet={tulipIconWebp} type="image/webp" />
-                <img src={tulipIcon} width={160} height={160} decoding="async" loading="lazy" style={{ objectFit: 'contain' }} alt="Afghan Emblem" />
-              </picture>
+              <img src={tulipIcon} decoding="async" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'contain', transform: 'scale(1.33)', transformOrigin: 'center' }} alt="Afghan Emblem" />
             </div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '4px' }}>Comunidade</div>
@@ -142,14 +140,11 @@ export const ModeSelectionScreen: React.FC = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              background: 'white',
+              background: 'transparent',
               borderRadius: '30px',
               filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.06))'
             }}>
-              <picture>
-                <source srcSet={spanishEmblemWebp} type="image/webp" />
-                <img src={spanishEmblem} width={160} height={160} decoding="async" loading="lazy" style={{ objectFit: 'contain' }} alt="Spanish Emblem" />
-              </picture>
+              <img src={spanishEmblem} decoding="async" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'contain', transform: 'scale(1.33)', transformOrigin: 'center' }} alt="Spanish Emblem" />
             </div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '4px' }}>Comunidade</div>
@@ -198,14 +193,11 @@ export const ModeSelectionScreen: React.FC = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              background: 'white',
+              background: 'transparent',
               borderRadius: '30px',
               filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.06))'
             }}>
-              <picture>
-                <source srcSet={sarehEmblemWebp} type="image/webp" />
-                <img src={sarehEmblem} width={160} height={160} decoding="async" loading="lazy" style={{ objectFit: 'contain' }} alt="Sareh Emblem" />
-              </picture>
+              <img src={sarehEmblem} decoding="async" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'contain', transform: 'scale(1.33)', transformOrigin: 'center' }} alt="Sareh Emblem" />
             </div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '4px' }}>Comunidade</div>

@@ -75,13 +75,13 @@ const RichTextEditor: React.FC<{ value: string; onChange: (val: string) => void;
 };
 
 const INTERNAL_ASSETS = [
-  { name: 'Ícone Tulipa (Afegã)', path: 'src/assets/tulip icon.jpeg' },
-  { name: 'Emblema Hispano', path: 'src/assets/Spanish cartoon emblem.jpeg' },
-  { name: 'Emblema Sareh', path: 'src/assets/sareh emblem.jpeg' },
-  { name: 'Robot 3D', path: 'src/assets/robot-3d.png' },
-  { name: 'Pan 3D', path: 'src/assets/pan-3d.png' },
-  { name: 'Memory Game', path: 'src/assets/memory_game.png' },
-  { name: 'Word Game', path: 'src/assets/word_game.png' }
+  { name: 'Ícone Tulipa (Afegã)', path: 'src/assets/tulip icon replacement.png' },
+  { name: 'Emblema Hispano', path: 'src/assets/spanish icon replacement.png' },
+  { name: 'Emblema Sareh', path: 'src/assets/sareh icon replacement.png' },
+  { name: 'Robot 3D', path: 'src/assets/robot-3d.webp' },
+  { name: 'Pan 3D', path: 'src/assets/pan-3d.webp' },
+  { name: 'Memory Game', path: 'src/assets/memory_game.webp' },
+  { name: 'Word Game', path: 'src/assets/word_game.webp' }
 ];
 
 const AssetPicker: React.FC<{ onSelect: (path: string) => void; onClose: () => void }> = ({ onSelect, onClose }) => (
@@ -402,6 +402,9 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
 
   return (
     <div className="planning-editor-view" style={{ background: '#f8fafc', minHeight: '100vh', paddingBottom: '150px' }}>
+      <div style={{ position: 'fixed', top: 10, left: 10, background: 'rgba(0,0,0,0.8)', color: 'white', padding: '5px 10px', borderRadius: '5px', zIndex: 999999, fontSize: '12px', fontWeight: 'bold', pointerEvents: 'none' }}>
+        Screen 7: PlanningEditor
+      </div>
       
       {/* HEADER FIXO */}
       <header className="editor-header" style={{ background: 'white', padding: '15px 30px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>

@@ -131,7 +131,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
   if (statsLoading) return <div className="screen-loading">Carregando sua jornada...</div>;
 
   return (
-    <div className="dash-v5-container" style={{ background: 'var(--bg)', minHeight: '100vh' }}>
+    <div className="dash-v5-container" style={{ background: 'var(--bg)', minHeight: '100vh', position: 'relative' }}>
+      <div style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(0,0,0,0.8)', color: 'white', padding: '5px 10px', borderRadius: '5px', zIndex: 999999, fontSize: '12px', fontWeight: 'bold', pointerEvents: 'none' }}>
+        Screen 3: Dashboard
+      </div>
       <header className="dash-v5-header" style={{ 
         background: 'rgba(154, 216, 114, 0.15)',
         backdropFilter: 'var(--glass)',

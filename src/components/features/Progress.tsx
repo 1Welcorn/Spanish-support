@@ -123,7 +123,10 @@ export const Progress: React.FC<ProgressProps> = ({
   };
 
   return (
-    <div className="screen progress-view">
+    <div className="screen progress-view" style={{ position: 'relative' }}>
+      <div style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(0,0,0,0.8)', color: 'white', padding: '5px 10px', borderRadius: '5px', zIndex: 999999, fontSize: '12px', fontWeight: 'bold', pointerEvents: 'none' }}>
+        Screen 5: Progress
+      </div>
       <div className="progress-overview-card">
          <div className="overview-header">
             <h2 className="overview-title">Tu Progreso Total</h2>
