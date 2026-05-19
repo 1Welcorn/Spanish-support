@@ -3,7 +3,6 @@ import {
   Flame, Star
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { useStudentJourney } from '../../hooks/useStudentJourney';
 import { LessonCard } from '../ui/LessonCard';
 import type { Lesson } from '../../types/index';
 
@@ -19,6 +18,8 @@ interface DashboardProps {
   onUpdateUnit?: (id: string, updates: any) => Promise<{ success: boolean; error?: string }>;
   onSyncDefaults?: () => Promise<void>;
   t: any;
+  currentStreak?: number;
+  totalStars?: number;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({
@@ -32,13 +33,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
   isAdmin,
   onUpdateUnit,
   onSyncDefaults,
-  t
+  t,
+  currentStreak = 0,
+  totalStars = 0
 }) => {
-  const { user, projectMode } = useAuth();
-  const { stats, loading: statsLoading } = useStudentJourney(user?.id || '');
-
-  const currentStreak = stats?.streak || 0;
-  const totalStars = stats?.stars || (sessionsCount * 10);
+  const { projectMode } = useAuth();
 
   const handleSupportClick = () => {
     const text = `Hola Prof. ${mediatorName}, ¡soy Ione! Necesito ayuda con las actividades de hoy.`;
@@ -128,7 +127,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
     });
   }, [units, answers, isAdmin, onUpdateUnit, onNavigate]);
 
-  if (statsLoading) return <div className="screen-loading">Carregando sua jornada...</div>;
+
 
   return (
     <div className="dash-v5-container" style={{ background: 'var(--bg)', minHeight: '100vh', position: 'relative' }}>

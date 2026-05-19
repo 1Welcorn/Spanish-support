@@ -5,11 +5,21 @@ import { useAuth } from '../context/AuthContext';
 import type { Unit, Session, Answer, AppSettings } from '../types';
 
 export const useDariData = () => {
-  const [units, setUnits] = useState<Unit[]>([]);
+  // Tenta carregar cache local para mostrar dados instantaneamente
+  const getCachedUnits = (): Unit[] => {
+    try {
+      const raw = localStorage.getItem('cache_units');
+      return raw ? JSON.parse(raw) : [];
+    } catch { return []; }
+  };
+
+  const cachedUnits = getCachedUnits();
+  const [units, setUnits] = useState<Unit[]>(cachedUnits);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [answers, setAnswers] = useState<Record<string, Answer>>({});
   const [settings, setSettings] = useState<Partial<AppSettings>>({});
-  const [loading, setLoading] = useState(true);
+  // Se houver cache, não bloqueia a tela com loading
+  const [loading, setLoading] = useState(cachedUnits.length === 0);
   const [syncStatus, setSyncStatus] = useState<'ok' | 'err'>('ok');
   const { user } = useAuth();
 
@@ -24,6 +34,8 @@ export const useDariData = () => {
       vocabulary_list: typeof u.vocabulary_list === 'string' ? JSON.parse(u.vocabulary_list) : (u.vocabulary_list || []),
       is_locked: !!u.is_locked
     }));
+    // Salva no cache local para próxima visita
+    try { localStorage.setItem('cache_units', JSON.stringify(sanitizedUnits)); } catch {}
     setUnits(sanitizedUnits);
     setLoading(false);
   }, []);
@@ -82,13 +94,6 @@ export const useDariData = () => {
       setLoading(false);
     }
   }, [user]);
-
-  useEffect(() => {
-    // Rely on realtime onSnapshot for initial load.
-    // Safety timeout to ensure loading screen doesn't get stuck if no internet/error
-    const timeout = setTimeout(() => setLoading(false), 5000);
-    return () => clearTimeout(timeout);
-  }, []);
 
   useEffect(() => {
     if (!user) return;

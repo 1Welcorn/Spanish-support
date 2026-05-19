@@ -103,7 +103,10 @@ export const App: React.FC = () => {
   }, [units, role, refresh]);
 
   // Student Journey Hook for rewards
-  const { addStudentRewards } = useStudentJourney(user?.id || '');
+  const { stats, addStudentRewards } = useStudentJourney(user?.id || '');
+
+  const currentStreak = stats?.streak || 0;
+  const totalStars = stats?.stars || (sessions.length * 10);
 
   const handleGameOver = useCallback(async (finalScore: number, wordsFound: number) => {
     const xpGained = wordsFound * 5;
@@ -367,6 +370,8 @@ export const App: React.FC = () => {
               onUpdateUnit={updateUnit}
               onSyncDefaults={importDefaults}
               t={t}
+              currentStreak={currentStreak}
+              totalStars={totalStars}
             />
           )}
 
