@@ -340,15 +340,17 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
     }
   };
 
-  // Sincroniza o estado local quando os dados globais mudam
+  // Hydrates local state ONLY on first load (when unitData is null).
+  // After that, local edits are the source of truth until the user navigates away.
+  // This prevents the Firestore onSnapshot listener from overwriting unsaved changes.
+  const hasHydrated = useRef(false);
   useEffect(() => {
-    if (unitDataFromProps) {
-      if (!unitData || !isDirty) {
-        setUnitData(JSON.parse(JSON.stringify(unitDataFromProps)));
-        setDescText(unitDataFromProps.descriptors?.join(', ') || '');
-      }
+    if (unitDataFromProps && !hasHydrated.current) {
+      hasHydrated.current = true;
+      setUnitData(JSON.parse(JSON.stringify(unitDataFromProps)));
+      setDescText(unitDataFromProps.descriptors?.join(', ') || '');
     }
-  }, [unitDataFromProps, isDirty]);
+  }, [unitDataFromProps]);
 
   const handleSave = async (overrideData?: any) => {
     const dataToSave = overrideData || unitData;
