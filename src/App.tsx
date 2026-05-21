@@ -131,9 +131,32 @@ export const App: React.FC = () => {
   // REMOVED: Heavy Render Path Log to improve performance
 
   if (authLoading || loading) {
+    const t = translations[projectMode || 'spanish'];
+    let currentEmblem = tulipIcon;
+    if (projectMode === 'spanish') currentEmblem = spanishEmblem;
+    else if (projectMode === 'sareh') currentEmblem = sarehEmblem;
+
     return (
-      <div id="loader" style={{ background: 'white' }}>
+      <div id="loader" style={{ background: 'var(--bg)' }}>
+        <div style={{
+          background: 'white',
+          padding: '40px',
+          borderRadius: 'var(--r-lg)',
+          boxShadow: 'var(--shadow-soft)',
+          marginBottom: '30px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          animation: 'float 6s ease-in-out infinite'
+        }}>
+          <img 
+            src={currentEmblem} 
+            alt="Logo" 
+            style={{ width: '160px', height: '160px', objectFit: 'contain' }} 
+          />
+        </div>
         <div className="loader-spinner"></div>
+        <div className="loader-msg" style={{ marginTop: '20px', fontWeight: 600 }}>{t.loading}</div>
       </div>
     );
   }
