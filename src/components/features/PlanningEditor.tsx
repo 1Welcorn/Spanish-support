@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { storage } from '../../services/firebase';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { Save, Plus, Trash2, BookOpen, Target, Lightbulb, ChevronLeft, Eye, X, Globe, Lock, Unlock, Bold, Italic, Palette, Eraser, AlignLeft, AlignCenter, AlignRight, AlignJustify, List, Type, Monitor, Image as ImageIcon, Zap, AlertTriangle, Smartphone, Clock, Check, Sparkles, ChefHat, Headphones, User, Building2, GraduationCap, ClipboardList } from 'lucide-react';
-import { UnitCard, VideoPlayerV5 } from './Activities';
+import { supabase } from '../../services/supabase';
+import { Save, Trash2, BookOpen, ChevronLeft, Eye, X, Globe, Bold, Italic, Palette, Eraser, AlignLeft, AlignCenter, AlignRight, AlignJustify, List, Type, Image as ImageIcon, Zap, Smartphone, Sparkles, ChefHat, Headphones, User, Building2, GraduationCap, ClipboardList } from 'lucide-react';
+import { UnitCard } from './Activities';
 import { COLORS } from '../../constants/index';
 
 // --- RICH TEXT EDITOR ---
@@ -147,94 +146,6 @@ const AssetPicker: React.FC<{ onSelect: (path: string) => void; onClose: () => v
    </div>
  );
  
- const MiniActivityPreview: React.FC<{ item: any; unitColor: string }> = ({ item, unitColor }) => (
-   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center', width: '100%' }}>
-     <span style={{ fontSize: '10px', fontWeight: 900, color: '#94a3b8' }}>SIMULADOR AO VIVO (VISÃO DO ALUNO)</span>
-     <div style={{ 
-       width: '100%', 
-       background: '#f1f5f9', 
-       borderRadius: '25px', 
-       padding: '20px', 
-       display: 'flex', 
-       justifyContent: 'center', 
-       minHeight: '250px',
-       overflow: 'hidden',
-       border: '1px solid #e2e8f0'
-     }}>
-       <div style={{ 
-         width: item.width || '100%', 
-         maxWidth: '100%',
-         background: item.frameColor || 'white', 
-         borderRadius: `${item.borderRadius !== undefined ? item.borderRadius / 2 : 20}px`,
-         padding: `${parseInt(item.framePadding || '0') / 2}px 15px 15px`,
-         boxShadow: item.frameColor === 'transparent' ? 'none' : '0 10px 30px rgba(0,0,0,0.05)',
-         display: 'flex',
-         gap: '10px',
-         minHeight: item.height ? `${item.height / 2.5}px` : '180px',
-         height: 'fit-content'
-       }}>
-         <div style={{ flex: 1 }}>
-           <div style={{ fontSize: '8px', color: unitColor, fontWeight: 900 }}>ATIVIDADE</div>
-           <div style={{ fontSize: '10px', fontWeight: 900, marginTop: '2px' }} dangerouslySetInnerHTML={{ __html: item.title || 'Título' }} />
-           <div style={{ fontSize: '8px', color: '#64748b', marginTop: '4px' }}>Instruções pedagógicas aparecem aqui...</div>
-         </div>
-         <div style={{ 
-           width: '100px', 
-           height: '80px', 
-           background: '#f8fafc', 
-           borderRadius: `${item.playerBorderRadius !== undefined ? item.playerBorderRadius / 2 : 15}px`,
-           border: '1px solid rgba(0,0,0,0.05)',
-           display: 'flex',
-           alignItems: 'center',
-           justifyContent: 'center',
-           overflow: 'hidden',
-           transform: `scale(${item.scale || 1})`
-         }}>
-           <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#fff', border: '2px solid #e2e8f0' }} />
-         </div>
-       </div>
-     </div>
-   </div>
- );
- 
- const MiniQuestionPreview: React.FC<{ item: any; unitColor: string }> = ({ item, unitColor }) => (
-   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center', width: '100%' }}>
-     <span style={{ fontSize: '10px', fontWeight: 900, color: '#94a3b8' }}>SIMULADOR AO VIVO (VISÃO DO ALUNO)</span>
-     <div style={{ 
-       width: '100%', 
-       background: '#f1f5f9', 
-       borderRadius: '25px', 
-       padding: '20px', 
-       display: 'flex', 
-       justifyContent: 'center', 
-       minHeight: '200px',
-       overflow: 'hidden',
-       border: '1px solid #e2e8f0'
-     }}>
-       <div style={{ 
-         width: item.width || '100%', 
-         maxWidth: '100%',
-         background: item.frameColor || 'white', 
-         borderRadius: `${item.borderRadius !== undefined ? item.borderRadius / 2 : 20}px`,
-         padding: `${parseInt(item.framePadding || '0') / 2}px 20px 20px`,
-         boxShadow: item.frameColor === 'transparent' ? 'none' : '0 10px 30px rgba(0,0,0,0.05)',
-         display: 'flex',
-         flexDirection: 'column',
-         gap: '10px',
-         minHeight: item.height ? `${item.height / 2.5}px` : '150px',
-         height: 'fit-content'
-       }}>
-         <div style={{ fontSize: '8px', color: '#7c3aed', fontWeight: 900 }}>PERGUNTA 1</div>
-         <div style={{ fontSize: '10px', fontWeight: 900 }} dangerouslySetInnerHTML={{ __html: item.q || 'Pergunta?' }} />
-         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            {(item.options || ['Opção 1']).map((o: any, idx: number) => (
-              <div key={idx} style={{ padding: '6px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '8px' }}>{o}</div>
-            ))}
-         </div>
-       </div>
-     </div>
-   </div>
- );
 
 interface PlanningEditorProps {
   unitId: string;
@@ -323,17 +234,53 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-      const filePath = `uploads/${fileName}`;
+      const filePath = `${fileName}`;
 
-      const storageRef = ref(storage, filePath);
-      await uploadBytes(storageRef, file);
-      const publicUrl = await getDownloadURL(storageRef);
+      console.log('PlanningEditor: Attempting file upload to Supabase Storage bucket "uploads"...');
+      const { data, error } = await supabase.storage.from('uploads').upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
 
+      if (error) {
+        console.warn('Supabase storage upload failed, falling back to base64 encoding...', error.message);
+        // Fallback: convert file to base64 Data URL
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          if (event.target?.result) {
+            const base64Url = event.target.result as string;
+            activeUploadCallback(base64Url);
+            setIsDirty(true);
+            setLoading(false);
+          }
+        };
+        reader.onerror = () => {
+          throw new Error('FileReader failed to read the file.');
+        };
+        reader.readAsDataURL(file);
+        return;
+      }
+
+      const { data: { publicUrl } } = supabase.storage.from('uploads').getPublicUrl(filePath);
       activeUploadCallback(publicUrl);
       setIsDirty(true);
     } catch (err: any) {
       console.error('Upload error:', err);
-      alert('Erro no upload. Verifique se o Storage está configurado no Firebase.');
+      // Final fallback to base64 in case of any exception
+      try {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          if (event.target?.result) {
+            const base64Url = event.target.result as string;
+            activeUploadCallback(base64Url);
+            setIsDirty(true);
+          }
+        };
+        reader.readAsDataURL(file);
+      } catch (innerErr) {
+        console.error('Final fallback error:', innerErr);
+        alert('Erro no upload do arquivo.');
+      }
     } finally {
       setLoading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -386,7 +333,7 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
     if (!tempEmbed.trim() || isSavingEmbed) return;
     setIsSavingEmbed(true);
     const normalized = normalizeEmbedUrl(tempEmbed);
-    const nextEmbeds = [...(unitData.embed_urls || []), { url: normalized, title: `Atividade`, width: '100%' }];
+    const nextEmbeds = [...(unitData.embed_urls || []), { url: normalized, url_spanish: '', url_afghan: '', url_sareh: '', title: `Atividade`, width: '100%' }];
     const nextData = { ...unitData, embed_urls: nextEmbeds };
     
     // Atualiza localmente e tenta salvar no banco imediatamente
@@ -447,6 +394,7 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
             { id: 'vocab', label: 'Vocabulário', icon: <AlignLeft size={18} />, color: '#0ea5e9' },
             { id: 'questions', label: 'Perguntas', icon: <Zap size={18} />, color: '#8b5cf6' },
             { id: 'visual', label: 'Visual & Metas', icon: <Sparkles size={18} />, color: '#f59e0b' },
+            { id: 'simulator', label: 'Simulador', icon: <Eye size={18} />, color: '#ec4899' },
           ].map(tab => (
             <button
               key={tab.id}
@@ -495,7 +443,12 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '30px' }}>
                      <div>
                        <label style={{ fontSize: '11px', fontWeight: 900, color: '#64748b', display: 'block', marginBottom: '8px', letterSpacing: '1px' }}>TÍTULO PRINCIPAL (PORTUGUÊS / BASE)</label>
-                       <RichTextEditor height="120px" value={unitData.title || ''} onChange={(val) => { setUnitData({...unitData, title: val}); setIsDirty(true); }} />
+                       <input 
+                         type="text" 
+                         value={(unitData.title || '').replace(/<[^>]*>?/gm, '')} 
+                         onChange={(e) => { setUnitData({...unitData, title: e.target.value}); setIsDirty(true); }} 
+                         style={{ width: '100%', padding: '15px', borderRadius: '15px', border: '1.5px solid #cbd5e1', fontSize: '18px', fontWeight: 900 }} 
+                       />
                      </div>
                      
                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
@@ -562,16 +515,29 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
                 <div style={{ background: 'white', borderRadius: '30px', padding: '30px', boxShadow: '0 10px 40px rgba(0,0,0,0.05)', border: '1px solid #f1f5f9' }}>
                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                       <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 900 }}>Mídias do Mediador</h3>
-                      <button onClick={() => { setUnitData({...unitData, external_links: [...(unitData.external_links || []), { label: 'video', url: '', width: '600px', height: 300, objectFit: 'cover' }]}); setIsDirty(true); }} style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '12px', fontWeight: 900, fontSize: '12px' }}>+ ADICIONAR VÍDEO/IMAGEM</button>
+                      <button onClick={() => { setUnitData({...unitData, external_links: [...(unitData.external_links || []), { label: 'video', url: '', url_spanish: '', url_afghan: '', url_sareh: '', width: '600px', height: 300, objectFit: 'cover' }]}); setIsDirty(true); }} style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '12px', fontWeight: 900, fontSize: '12px' }}>+ ADICIONAR VÍDEO/IMAGEM</button>
                    </div>
                    
                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px' }}>
                       {(unitData.external_links || []).map((link: any, i: number) => (
                         <div key={i} style={{ background: '#f8fafc', padding: '20px', borderRadius: '24px', border: '1px solid #e2e8f0' }}>
-                           {/* ... conteúdo do link igual ao anterior ... */}
                            <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
-                              <input type="text" value={link.url} placeholder="URL do Vídeo..." style={{ flex: 1, padding: '12px', borderRadius: '12px' }} onChange={(e) => { const nl = [...unitData.external_links]; nl[i].url = e.target.value; setUnitData({...unitData, external_links: nl}); setIsDirty(true); }} />
+                              <input type="text" value={link.url} placeholder="URL do Vídeo (Padrão)..." style={{ flex: 1, padding: '12px', borderRadius: '12px' }} onChange={(e) => { const nl = [...unitData.external_links]; nl[i].url = e.target.value; setUnitData({...unitData, external_links: nl}); setIsDirty(true); }} />
                               <button onClick={() => { const nl = unitData.external_links.filter((_: any, idx: number) => idx !== i); setUnitData({...unitData, external_links: nl}); setIsDirty(true); }} style={{ color: '#ef4444', background: '#fee2e2', border: 'none', borderRadius: '12px', padding: '0 15px' }}><Trash2 size={18} /></button>
+                           </div>
+                           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+                               <div>
+                                  <label style={{ fontSize: '10px', fontWeight: 900, color: '#ef4444', display: 'block', marginBottom: '5px' }}>ESPANHOL (SPANISH)</label>
+                                  <input type="text" value={link.url_spanish || ''} placeholder="URL espanhol..." style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid #fee2e2' }} onChange={(e) => { const nl = [...unitData.external_links]; nl[i].url_spanish = e.target.value; setUnitData({...unitData, external_links: nl}); setIsDirty(true); }} />
+                               </div>
+                               <div>
+                                  <label style={{ fontSize: '10px', fontWeight: 900, color: '#059669', display: 'block', marginBottom: '5px' }}>AFEGÃO (DARI)</label>
+                                  <input type="text" value={link.url_afghan || ''} placeholder="URL afegão..." style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid #d1fae5' }} onChange={(e) => { const nl = [...unitData.external_links]; nl[i].url_afghan = e.target.value; setUnitData({...unitData, external_links: nl}); setIsDirty(true); }} />
+                               </div>
+                               <div>
+                                  <label style={{ fontSize: '10px', fontWeight: 900, color: '#3b82f6', display: 'block', marginBottom: '5px' }}>SAREH / AIONE</label>
+                                  <input type="text" value={link.url_sareh || ''} placeholder="URL sareh..." style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid #dbeafe' }} onChange={(e) => { const nl = [...unitData.external_links]; nl[i].url_sareh = e.target.value; setUnitData({...unitData, external_links: nl}); setIsDirty(true); }} />
+                               </div>
                            </div>
                            <StylingControls item={link} onChange={(upd) => { const nl = [...unitData.external_links]; nl[i] = {...nl[i], ...upd}; setUnitData({...unitData, external_links: nl}); setIsDirty(true); }} />
                         </div>
@@ -609,6 +575,25 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                              <label style={{ fontSize: '10px', fontWeight: 900 }}>TÍTULO DA ATIVIDADE</label>
                              <input type="text" value={item.title || ''} onChange={(e) => { const nl = [...unitData.embed_urls]; nl[i].title = e.target.value; setUnitData({...unitData, embed_urls: nl}); setIsDirty(true); }} style={{ padding: '12px', borderRadius: '12px', border: '1px solid #e2e8f0' }} />
+                             
+                             <label style={{ fontSize: '10px', fontWeight: 900 }}>LINK DA ATIVIDADE (PADRÃO)</label>
+                             <input type="text" value={item.url || ''} placeholder="https://wordwall.net/resource/..." onChange={(e) => { const nl = [...unitData.embed_urls]; nl[i].url = normalizeEmbedUrl(e.target.value); setUnitData({...unitData, embed_urls: nl}); setIsDirty(true); }} style={{ padding: '12px', borderRadius: '12px', border: '1px solid #cbd5e1' }} />
+
+                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+                                <div>
+                                   <label style={{ fontSize: '9px', fontWeight: 900, color: '#ef4444', display: 'block', marginBottom: '5px' }}>LINK ESPANHOL</label>
+                                   <input type="text" value={item.url_spanish || ''} placeholder="Link espanhol..." onChange={(e) => { const nl = [...unitData.embed_urls]; nl[i].url_spanish = normalizeEmbedUrl(e.target.value); setUnitData({...unitData, embed_urls: nl}); setIsDirty(true); }} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #fee2e2', fontSize: '12px' }} />
+                                </div>
+                                <div>
+                                   <label style={{ fontSize: '9px', fontWeight: 900, color: '#059669', display: 'block', marginBottom: '5px' }}>LINK AFEGÃO (DARI)</label>
+                                   <input type="text" value={item.url_afghan || ''} placeholder="Link afegão..." onChange={(e) => { const nl = [...unitData.embed_urls]; nl[i].url_afghan = normalizeEmbedUrl(e.target.value); setUnitData({...unitData, embed_urls: nl}); setIsDirty(true); }} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #d1fae5', fontSize: '12px' }} />
+                                </div>
+                                <div>
+                                   <label style={{ fontSize: '9px', fontWeight: 900, color: '#3b82f6', display: 'block', marginBottom: '5px' }}>LINK SAREH</label>
+                                   <input type="text" value={item.url_sareh || ''} placeholder="Link sareh..." onChange={(e) => { const nl = [...unitData.embed_urls]; nl[i].url_sareh = normalizeEmbedUrl(e.target.value); setUnitData({...unitData, embed_urls: nl}); setIsDirty(true); }} style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #dbeafe', fontSize: '12px' }} />
+                                </div>
+                             </div>
+                             
                              <label style={{ fontSize: '10px', fontWeight: 900 }}>DICAS PARA O ALUNO</label>
                              <RichTextEditor height="150px" value={item.brief || ''} onChange={(val) => { const nl = [...unitData.embed_urls]; nl[i].brief = val; setUnitData({...unitData, embed_urls: nl}); setIsDirty(true); }} />
                           </div>
@@ -740,6 +725,131 @@ const PlanningEditor: React.FC<PlanningEditorProps> = ({ unitId, onBack, updateU
                </div>
             </section>
           )}
+
+          {/* TAB: SIMULADOR */}
+          {activeTab === 'simulator' && (() => {
+            // Largura real da tela do aluno:
+            // viewport total (~1500px) – sidebar app (~280px) = ~1220px de área de conteúdo
+            // O editor ocupa: viewport – sidebar-editor(280px) – padding(80px) = ~1140px de área
+            // Queremos simular 1220px num container de ~860px → escala ≈ 0.7
+            const REAL_WIDTH = 1220;
+            const DISPLAY_WIDTH = 860;
+            const SCALE = DISPLAY_WIDTH / REAL_WIDTH;
+            const SCALED_HEIGHT_FACTOR = SCALE; // para manter a caixa de altura proporcional
+
+            return (
+              <section style={{ animation: 'fadeIn 0.3s ease-out' }}>
+                <div style={{ marginBottom: '30px' }}>
+                  <h2 style={{ fontSize: '24px', fontWeight: 900, color: '#ec4899', margin: '0 0 8px 0' }}>
+                    Simulador — Visão Fiel do Aluno
+                  </h2>
+                  <p style={{ fontSize: '14px', color: '#64748b', margin: 0 }}>
+                    Renderização em <strong>escala proporcional {Math.round(SCALE * 100)}%</strong> do que o aluno vê na tela real ({REAL_WIDTH}px → {DISPLAY_WIDTH}px).
+                  </p>
+                </div>
+
+                <div style={{
+                  background: 'linear-gradient(135deg, #fdf2f8 0%, #ede9fe 100%)',
+                  borderRadius: '30px',
+                  padding: '30px',
+                  border: '2px dashed #ec4899',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '20px'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    background: '#ec4899',
+                    color: 'white',
+                    padding: '8px 20px',
+                    borderRadius: '20px',
+                    fontSize: '12px',
+                    fontWeight: 900,
+                    letterSpacing: '1px'
+                  }}>
+                    <Eye size={14} /> VISÃO FIEL DO ALUNO — ESCALA {Math.round(SCALE * 100)}%
+                  </div>
+
+                  {/* FRAME COM DIMENSÕES REAIS + ESCALA CSS */}
+                  <div style={{
+                    width: `${DISPLAY_WIDTH}px`,
+                    background: 'white',
+                    borderRadius: '20px',
+                    overflow: 'hidden',
+                    boxShadow: '0 30px 80px rgba(0,0,0,0.18)',
+                    border: '4px solid #ec4899',
+                    position: 'relative',
+                    flexShrink: 0,
+                  }}>
+                    {/* Barra de navegador simulada — na escala normal do frame */}
+                    <div style={{
+                      background: '#f1f5f9',
+                      padding: '10px 20px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      borderBottom: '1px solid #e2e8f0'
+                    }}>
+                      <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ef4444' }} />
+                      <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#f59e0b' }} />
+                      <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#10b981' }} />
+                      <div style={{ flex: 1, background: 'white', padding: '4px 12px', borderRadius: '8px', fontSize: '11px', color: '#94a3b8', marginLeft: '8px' }}>
+                        pontes-de-esperanca.app / aula — tela do aluno ({REAL_WIDTH}px)
+                      </div>
+                      <span style={{ fontSize: '10px', fontWeight: 900, color: '#ec4899', background: '#fce7f3', padding: '2px 8px', borderRadius: '10px' }}>
+                        {Math.round(SCALE * 100)}%
+                      </span>
+                    </div>
+
+                    {/* Container com largura REAL do aluno, depois escalado via transform */}
+                    {/* A caixa externa tem a largura do display (DISPLAY_WIDTH) */}
+                    {/* O componente interno tem a largura real (REAL_WIDTH) e é escalado */}
+                    <div style={{
+                      /* altura proporcional: o componente interno tem ~650px de altura min,
+                         após o scale fica SCALE * 650px */
+                      height: `${SCALE * 650}px`,
+                      overflow: 'hidden',
+                      position: 'relative'
+                    }}>
+                      <div style={{
+                        width: `${REAL_WIDTH}px`,
+                        transformOrigin: 'top left',
+                        transform: `scale(${SCALE})`,
+                        /* remove o badge de debug que usa position:fixed */
+                        position: 'relative',
+                      }}>
+                        {/* Oculta o badge de debug "Screen 4: Activities" que usa position:fixed */}
+                        <style>{`
+                          .sim-wrapper [style*="position: fixed"] { display: none !important; }
+                          .sim-wrapper .dari-start-arrow { display: none !important; }
+                        `}</style>
+                        <div className="sim-wrapper">
+                          <UnitCard
+                            unit={unitData}
+                            answers={{}}
+                            onSaveAnswer={async () => false}
+                            onSaveSession={async () => false}
+                            isAdmin={false}
+                            isMediator={false}
+                            onToggle={() => {}}
+                            onGoHome={() => {}}
+                            currentColors={COLORS[unitData.color] || COLORS['natural']}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p style={{ fontSize: '12px', color: '#94a3b8', textAlign: 'center', margin: 0 }}>
+                    💡 A visão acima é proporcional e fiel à tela real do aluno. Salve a aula para ver as alterações aqui.
+                  </p>
+                </div>
+              </section>
+            );
+          })()}
 
         </div>
       </div>

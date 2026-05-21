@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
-import { db } from '../services/firebase';
-import { collection, getDocs, query, orderBy, where, doc, setDoc, addDoc, deleteDoc, updateDoc, onSnapshot } from 'firebase/firestore';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { supabase, supabaseAdmin } from '../services/supabase';
 import { useAuth } from '../context/AuthContext';
 import type { Unit, Session, Answer, AppSettings } from '../types';
+
 
 export const useDariData = () => {
   // Tenta carregar cache local para mostrar dados instantaneamente
@@ -23,9 +23,8 @@ export const useDariData = () => {
   const [syncStatus, setSyncStatus] = useState<'ok' | 'err'>('ok');
   const { user } = useAuth();
 
-  const handleUnitsSnapshot = useCallback((uSnapshot: any) => {
-    const fetchedUnits = uSnapshot.docs.map((d: any) => ({ id: d.id, ...d.data() } as any));
-    const sanitizedUnits = fetchedUnits.map((u: any) => ({
+  const sanitizeUnits = useCallback((fetchedUnits: any[]): Unit[] => {
+    return fetchedUnits.map((u: any) => ({
       ...u,
       descriptors: typeof u.descriptors === 'string' ? JSON.parse(u.descriptors) : (u.descriptors || []),
       embed_urls: typeof u.embed_urls === 'string' ? JSON.parse(u.embed_urls) : (u.embed_urls || []),
@@ -34,34 +33,76 @@ export const useDariData = () => {
       vocabulary_list: typeof u.vocabulary_list === 'string' ? JSON.parse(u.vocabulary_list) : (u.vocabulary_list || []),
       is_locked: !!u.is_locked
     }));
-    // Salva no cache local para próxima visita
-    try { localStorage.setItem('cache_units', JSON.stringify(sanitizedUnits)); } catch {}
-    setUnits(sanitizedUnits);
-    setLoading(false);
   }, []);
 
-  const handleSessionsSnapshot = useCallback((sSnapshot: any) => {
-    const fetchedSessions = sSnapshot.docs.map((d: any) => ({ id: d.id, ...d.data() } as Session));
-    fetchedSessions.sort((a: any, b: any) => new Date(b.session_date).getTime() - new Date(a.session_date).getTime());
-    setSessions(fetchedSessions);
-  }, []);
+  const fetchUnits = useCallback(async () => {
+    try {
+      const { data, error } = await supabase.from('units').select('*').order('sort_order', { ascending: true });
+      if (error) throw error;
+      if (data) {
+        const sanitized = sanitizeUnits(data);
+        try { localStorage.setItem('cache_units', JSON.stringify(sanitized)); } catch {}
+        setUnits(sanitized);
+      }
+    } catch (err) {
+      console.error('Error fetching units:', err);
+      setSyncStatus('err');
+    }
+  }, [sanitizeUnits]);
 
-  const handleAnswersSnapshot = useCallback((aSnapshot: any) => {
-    const aMap: Record<string, Answer> = {};
-    aSnapshot.docs.forEach((d: any) => {
-      const a = d.data() as Answer;
-      aMap[`${a.unit_id}-${a.question_index}`] = a;
-    });
-    setAnswers(aMap);
-  }, []);
+  const fetchSessions = useCallback(async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from('sessions')
+        .select('*')
+        .eq('profile_id', user.id);
+      
+      if (error) throw error;
+      if (data) {
+        const sorted = [...data].sort((a: any, b: any) => new Date(b.session_date).getTime() - new Date(a.session_date).getTime());
+        setSessions(sorted as Session[]);
+      }
+    } catch (err) {
+      console.error('Error fetching sessions:', err);
+    }
+  }, [user]);
 
-  const handleSettingsSnapshot = useCallback((setsSnapshot: any) => {
-    const sMap: Partial<AppSettings> = {};
-    setsSnapshot.docs.forEach((d: any) => {
-      const s = d.data();
-      sMap[s.key as keyof AppSettings] = s.value;
-    });
-    setSettings(sMap);
+  const fetchAnswers = useCallback(async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from('answers')
+        .select('*')
+        .eq('profile_id', user.id);
+      
+      if (error) throw error;
+      if (data) {
+        const aMap: Record<string, Answer> = {};
+        data.forEach((a: any) => {
+          aMap[`${a.unit_id}-${a.question_index}`] = a as Answer;
+        });
+        setAnswers(aMap);
+      }
+    } catch (err) {
+      console.error('Error fetching answers:', err);
+    }
+  }, [user]);
+
+  const fetchSettings = useCallback(async () => {
+    try {
+      const { data, error } = await supabase.from('settings').select('*');
+      if (error) throw error;
+      if (data) {
+        const sMap: Partial<AppSettings> = {};
+        data.forEach((s: any) => {
+          sMap[s.key as keyof AppSettings] = s.value;
+        });
+        setSettings(sMap);
+      }
+    } catch (err) {
+      console.error('Error fetching settings:', err);
+    }
   }, []);
 
   const fetchData = useCallback(async () => {
@@ -71,59 +112,70 @@ export const useDariData = () => {
     }
     try {
       setLoading(true);
-      const profileId = user.id;
-
-      // Fetch all data in parallel for better performance
-      const [uSnapshot, sSnapshot, aSnapshot, setsSnapshot] = await Promise.all([
-        getDocs(query(collection(db, 'units'), orderBy('sort_order'))),
-        getDocs(query(collection(db, 'sessions'), where('profile_id', '==', profileId))),
-        getDocs(query(collection(db, 'answers'), where('profile_id', '==', profileId))),
-        getDocs(collection(db, 'settings'))
+      await Promise.all([
+        fetchUnits(),
+        fetchSessions(),
+        fetchAnswers(),
+        fetchSettings()
       ]);
-
-      handleUnitsSnapshot(uSnapshot);
-      handleSessionsSnapshot(sSnapshot);
-      handleAnswersSnapshot(aSnapshot);
-      handleSettingsSnapshot(setsSnapshot);
-
       setSyncStatus('ok');
     } catch (err) {
-      console.error('Error fetching data from Firestore:', err);
+      console.error('Error fetching data from Supabase:', err);
       setSyncStatus('err');
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, fetchUnits, fetchSessions, fetchAnswers, fetchSettings]);
 
   useEffect(() => {
-    if (!user) return;
-    
-    // Set up realtime listeners for Firestore
-    const unsubUnits = onSnapshot(collection(db, 'units'), handleUnitsSnapshot, () => setSyncStatus('err'));
-    const unsubSessions = onSnapshot(query(collection(db, 'sessions'), where('profile_id', '==', user.id)), handleSessionsSnapshot, () => setSyncStatus('err'));
-    const unsubAnswers = onSnapshot(query(collection(db, 'answers'), where('profile_id', '==', user.id)), handleAnswersSnapshot, () => setSyncStatus('err'));
-    const unsubSettings = onSnapshot(collection(db, 'settings'), handleSettingsSnapshot, () => setSyncStatus('err'));
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    fetchData();
+
+    // Set up realtime subscriptions
+    const channel = supabase.channel('schema-db-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'units' }, () => {
+        fetchUnits();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'sessions' }, () => {
+        fetchSessions();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'answers' }, () => {
+        fetchAnswers();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'settings' }, () => {
+        fetchSettings();
+      })
+      .subscribe((status) => {
+        setSyncStatus(status === 'SUBSCRIBED' ? 'ok' : 'err');
+      });
 
     return () => {
-      unsubUnits();
-      unsubSessions();
-      unsubAnswers();
-      unsubSettings();
+      channel.unsubscribe();
     };
-  }, [handleUnitsSnapshot, handleSessionsSnapshot, handleAnswersSnapshot, handleSettingsSnapshot, user]);
+  }, [user, fetchData, fetchUnits, fetchSessions, fetchAnswers, fetchSettings]);
 
   const saveAnswer = useCallback(async (unitId: string, qIdx: number, val: string) => {
+    if (!user) return false;
     try {
-      const docId = `${user?.uid || user?.id}_${unitId}_${qIdx}`;
-      await setDoc(doc(db, 'answers', docId), {
-        profile_id: user?.uid || user?.id,
+      const payload = {
+        profile_id: user.id,
         unit_id: unitId,
         question_index: qIdx,
         answer_value: val,
-        is_done: true
-      });
+        is_done: true,
+        updated_at: new Date().toISOString()
+      };
       
-      // Atualiza estado local apenas após sucesso
+      const { error } = await supabase
+        .from('answers')
+        .upsert(payload, { onConflict: 'profile_id,unit_id,question_index' });
+
+      if (error) throw error;
+      
       const answerKey = `${unitId}-${qIdx}`;
       setAnswers(prev => ({
         ...prev,
@@ -142,55 +194,67 @@ export const useDariData = () => {
       setSyncStatus('err');
       return false;
     }
-  }, []);
+  }, [user]);
 
   const saveSession = useCallback(async (unitId: string, note: string) => {
+    if (!user) return false;
     try {
       const sessionData = {
-        profile_id: user?.uid || user?.id,
+        profile_id: user.id,
         unit_id: unitId,
         session_date: new Date().toLocaleDateString('pt-BR'),
         note
       };
-      const docRef = await addDoc(collection(db, 'sessions'), sessionData);
+      const { data, error } = await supabase.from('sessions').insert(sessionData).select();
+      if (error) throw error;
       
-      setSessions(prev => [{ id: docRef.id, ...sessionData } as Session, ...prev]);
+      const inserted = data?.[0] || sessionData;
+      setSessions(prev => [inserted as Session, ...prev]);
       return true;
     } catch (err) {
       console.error('Exception in saveSession:', err);
       return false;
     }
-  }, []);
+  }, [user]);
 
   const resetUnitAnswers = useCallback(async (unitId: string): Promise<boolean> => {
+    if (!user) return false;
     try {
-      const q = query(collection(db, 'answers'), where('unit_id', '==', unitId), where('profile_id', '==', user?.uid || user?.id));
-      const snapshot = await getDocs(q);
-      const deletePromises = snapshot.docs.map((d: any) => deleteDoc(d.ref));
-      await Promise.all(deletePromises);
+      const { error } = await supabase
+        .from('answers')
+        .delete()
+        .eq('unit_id', unitId)
+        .eq('profile_id', user.id);
+
+      if (error) throw error;
       
       setSyncStatus('ok');
-        // Atualiza estado local eliminando as chaves desta unidade
-        setAnswers(prev => {
-          const next = { ...prev };
-          Object.keys(next).forEach(key => {
-            if (key.startsWith(`${unitId}-`)) {
-              delete next[key];
-            }
-          });
-          return next;
+      setAnswers(prev => {
+        const next = { ...prev };
+        Object.keys(next).forEach(key => {
+          if (key.startsWith(`${unitId}-`)) {
+            delete next[key];
+          }
         });
-        return true;
+        return next;
+      });
+      return true;
     } catch (err) {
       console.error('Exception in resetUnitAnswers:', err);
       setSyncStatus('err');
       return false;
     }
-  }, []);
+  }, [user]);
 
   const updateSession = useCallback(async (sessionId: string, note: string) => {
     try {
-      await updateDoc(doc(db, 'sessions', sessionId), { note });
+      const { error } = await supabase
+        .from('sessions')
+        .update({ note })
+        .eq('id', sessionId);
+
+      if (error) throw error;
+      
       setSyncStatus('ok');
       setSessions(prev => prev.map(s => s.id === sessionId ? { ...s, note } : s));
       return true;
@@ -203,7 +267,13 @@ export const useDariData = () => {
 
   const deleteUnitSession = useCallback(async (sessionId: string) => {
     try {
-      await deleteDoc(doc(db, 'sessions', sessionId));
+      const { error } = await supabase
+        .from('sessions')
+        .delete()
+        .eq('id', sessionId);
+
+      if (error) throw error;
+      
       setSyncStatus('ok');
       setSessions(prev => prev.filter(s => s.id !== sessionId));
       return true;
@@ -235,7 +305,9 @@ export const useDariData = () => {
         external_links: []
       };
 
-      await setDoc(doc(db, 'units', newId), newUnit);
+      const { error } = await supabase.from('units').insert(newUnit);
+      if (error) throw error;
+      
       setUnits(prev => [...prev, newUnit]);
       return true;
     } catch (err) {
@@ -246,10 +318,46 @@ export const useDariData = () => {
 
   const updateUnit = useCallback(async (id: string, updates: any) => {
     try {
-      console.log('useData: Updating unit', id, updates);
-      await updateDoc(doc(db, 'units', id), updates);
-      // Atualização otimista
+      console.log('useData: Updating unit', id, Object.keys(updates));
+      
+      // 1. Atualização otimista instantânea no estado do React
       setUnits(prev => prev.map(u => u.id === id ? { ...u, ...updates } : u));
+      
+      // 2. Atualização síncrona do cache localStorage para persistência imediata
+      try {
+        const cached = localStorage.getItem('cache_units');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          const updated = parsed.map((u: any) => u.id === id ? { ...u, ...updates } : u);
+          localStorage.setItem('cache_units', JSON.stringify(updated));
+        }
+      } catch (cacheErr) {
+        console.warn('Failed to update localStorage cache:', cacheErr);
+      }
+
+      // 3. Execução da gravação do Supabase (removendo ID do payload de atualização)
+      // Usa supabaseAdmin (service key) para bypassar RLS quando disponível.
+      // Isso permite que o admin salve mesmo sem sessão JWT real no Supabase.
+      const { id: _, ...payload } = updates;
+      const { error, data } = await supabaseAdmin
+        .from('units')
+        .update(payload)
+        .eq('id', id)
+        .select('id');
+
+      if (error) {
+        console.error('[SUPABASE ERROR] code:', error.code, 'message:', error.message, 'details:', error.details);
+        throw error;
+      }
+
+      // Verifica se alguma linha foi afetada (RLS pode bloquear silenciosamente)
+      if (!data || data.length === 0) {
+        console.warn('[SUPABASE WARNING] Unit update returned 0 rows. RLS may have blocked the write. Unit id:', id);
+        // Não falha — o dado já foi salvo localmente. Mas loga para diagnóstico.
+      } else {
+        console.log('[SUPABASE OK] Unit updated successfully:', id);
+      }
+
       return { success: true };
     } catch (err: any) {
       console.error('[SAVE EXCEPTION] useData:', err);

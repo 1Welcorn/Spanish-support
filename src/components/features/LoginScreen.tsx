@@ -99,7 +99,8 @@ export const LoginScreen: React.FC<{ settings: any }> = () => {
     loading,
     authError,
     projectMode,
-    setProjectMode
+    setProjectMode,
+    loginWithRole
   } = useAuth();
 
   const t = translations[projectMode || 'spanish'];
@@ -224,6 +225,24 @@ export const LoginScreen: React.FC<{ settings: any }> = () => {
           <div className="loader-spinner" style={{ margin: '0 auto' }}></div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {window.location.hostname === 'localhost' && (
+              <button
+                onClick={() => loginWithRole('admin')}
+                style={{
+                  background: '#f59e0b',
+                  color: 'white',
+                  border: 'none',
+                  padding: '16px 20px',
+                  borderRadius: '16px',
+                  fontWeight: 900,
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 12px rgba(245,158,11,0.2)',
+                  fontSize: '15px'
+                }}
+              >
+                🔐 [DEV] ENTRAR COMO ADMIN (BYPASS)
+              </button>
+            )}
             {/* Google Login for Admin/Mediator */}
             <button
               className="login-btn"

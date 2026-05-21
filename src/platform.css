@@ -3107,8 +3107,8 @@ body.immersive-mode .bottom-nav {
 /* Canvas/Container that wraps the video player */
 .mission-media-v7 {
   width: auto;
-  border-radius: 20px;
-  overflow: hidden;
+  /* border-radius removido — gerenciado dinamicamente pelo VideoPlayerV5 */
+  /* overflow removido — gerenciado pelo media-renderer-v10 */
   display: flex;
   justify-content: center;
   align-items: center;

@@ -51,6 +51,9 @@ export interface EmbedActivity {
   url_spanish?: string;
   url_sareh?: string;
   title?: string;
+  title_spanish?: string;
+  title_afghan?: string;
+  title_sareh?: string;
   width?: string;
   thumbnailUrl?: string;
   maskIcon?: string;
@@ -62,6 +65,9 @@ export interface EmbedActivity {
   framePadding?: string;
   frameColor?: string;
   brief?: string;
+  brief_spanish?: string;
+  brief_afghan?: string;
+  brief_sareh?: string;
 }
 
 export interface GameWord {

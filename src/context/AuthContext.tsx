@@ -1,10 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { UserRole } from '../types';
 export type ProjectMode = 'afghan' | 'spanish' | 'sareh';
-import { auth, db } from '../services/firebase';
-import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import type { User } from 'firebase/auth';
+import { supabase } from '../services/supabase';
 
 export interface AppUser {
   id: string;
@@ -49,57 +46,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [authError, setAuthError] = useState<string | null>(null);
   const [projectMode, setProjectMode] = useState<ProjectMode | null>(null);
 
-  useEffect(() => {
-    console.log("AuthProvider: Initializing...");
+  const handleUser = async (supabaseUser: any) => {
+    console.log("AuthContext: Handling user:", supabaseUser?.email);
     
-    // Check initial mock user state
-    const savedMock = localStorage.getItem('dari_mock_user');
-    const savedMode = localStorage.getItem('dari_project_mode') as ProjectMode;
-    
-    if (savedMode) setProjectMode(savedMode);
-
-    if (savedMock) {
-      const mockUser = JSON.parse(savedMock);
-      setUser(mockUser);
-      setRole('student');
-      setLoading(false);
-    }
-
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser: any) => {
-      console.log("AuthProvider: Auth state changed:", !!firebaseUser);
-      if (firebaseUser) {
-        handleUser(firebaseUser);
-      } else if (!savedMock) {
-        setUser(null);
-        setRole(null);
-      }
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  const handleUser = async (firebaseUser: User | null) => {
-    console.log("AuthContext: Handling user:", firebaseUser?.email);
-    
-    if (firebaseUser) {
-      // 1. Set User Basic Data
+    if (supabaseUser) {
       const normalizedUser: AppUser = {
-        id: firebaseUser.uid,
-        uid: firebaseUser.uid,
-        email: firebaseUser.email,
-        displayName: firebaseUser.displayName,
-        photoURL: firebaseUser.photoURL,
+        id: supabaseUser.id,
+        uid: supabaseUser.id,
+        email: supabaseUser.email || null,
+        displayName: supabaseUser.user_metadata?.full_name || supabaseUser.email || null,
+        photoURL: supabaseUser.user_metadata?.avatar_url || null,
         user_metadata: {
-          full_name: firebaseUser.displayName || '',
-          avatar_url: firebaseUser.photoURL || ''
+          full_name: supabaseUser.user_metadata?.full_name || '',
+          avatar_url: supabaseUser.user_metadata?.avatar_url || ''
         }
       };
       setUser(normalizedUser);
 
-      // 2. Identify Role and Auto-Mode
-      if (firebaseUser.email) {
-        const email = firebaseUser.email.toLowerCase();
+      // Ensure profile exists in profiles table
+      try {
+        await supabase.from('profiles').upsert({
+          id: supabaseUser.id,
+          email: supabaseUser.email,
+          name: supabaseUser.user_metadata?.full_name || supabaseUser.email,
+          updated_at: new Date().toISOString()
+        });
+      } catch (e) {
+        console.error("AuthContext profiles upsert error:", e);
+      }
+
+      // Identify Role and Auto-Mode
+      if (supabaseUser.email) {
+        const email = supabaseUser.email.toLowerCase();
         console.log("AuthContext: Validating role for email:", email);
         
         // Is it an Admin?
@@ -113,7 +91,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Is it a Mediator?
         else if (MEDIATOR_EMAILS.includes(email)) {
           console.log("AuthContext: ROLE SET TO MEDIATOR");
-          setRole('admin'); // Temporário para garantir acesso total se necessário
+          setRole('admin'); // Mediator has full access
           localStorage.setItem('dari_role', 'admin');
         } 
         // Is it a known Student?
@@ -140,12 +118,67 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  useEffect(() => {
+    console.log("AuthProvider: Initializing...");
+    
+    // Check initial mock user state
+    const savedMock = localStorage.getItem('dari_mock_user');
+    const savedMode = localStorage.getItem('dari_project_mode') as ProjectMode;
+    
+    if (savedMode) setProjectMode(savedMode);
+
+    if (savedMock) {
+      try {
+        const mockUser = JSON.parse(savedMock);
+        const savedRole = localStorage.getItem('dari_role') as UserRole;
+        setUser(mockUser);
+        setRole(savedRole || 'student');
+      } catch (e) {
+        console.error("Error parsing saved mock user:", e);
+      }
+    }
+
+    // Get current session state
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        handleUser(session.user);
+      } else if (!savedMock) {
+        setUser(null);
+        setRole(null);
+      }
+      setLoading(false);
+    });
+
+    // Listen to changes in auth state
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("AuthProvider: Auth state changed:", !!session);
+      if (session?.user) {
+        handleUser(session.user);
+      } else {
+        const freshMock = localStorage.getItem('dari_mock_user');
+        if (!freshMock) {
+          setUser(null);
+          setRole(null);
+        }
+      }
+      setLoading(false);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
   const signInWithGoogle = async () => {
     setAuthError(null);
     try {
-      const provider = new GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: 'select_account' });
-      await signInWithPopup(auth, provider);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin
+        }
+      });
+      if (error) throw error;
     } catch (error: any) {
       console.error('Error logging in with Google:', error.message);
       setAuthError(error.message);
@@ -160,27 +193,78 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Determine mode based on student profile or name
       let mode: ProjectMode = student.mode as ProjectMode;
       
-      // Fallback for students without explicit mode in profile
       if (!mode) {
         mode = name.toUpperCase().includes('ASMA') || name.toUpperCase().includes('HOSNA') ? 'afghan' : 'spanish';
       }
       
-      const mockUser: AppUser = {
-        id: `mock-${student.name.replace(/\s+/g, '-').toLowerCase()}`,
-        uid: `mock-${student.name.replace(/\s+/g, '-').toLowerCase()}`,
-        email: student.email,
-        displayName: student.name,
-        photoURL: null,
-        user_metadata: { full_name: student.name }
-      };
-      
-      setUser(mockUser);
-      setRole('student');
-      setProjectMode(mode);
-      localStorage.setItem('dari_role', 'student');
-      localStorage.setItem('dari_project_mode', mode);
-      localStorage.setItem('dari_mock_user', JSON.stringify(mockUser));
-      return true;
+      const studentEmail = student.email;
+      const studentPassword = `${pin}_secure_sareh_2026`;
+
+      try {
+        setLoading(true);
+        // 1. Try to sign in with password
+        let authUser: any = null;
+        const signInRes = await supabase.auth.signInWithPassword({
+          email: studentEmail,
+          password: studentPassword,
+        });
+
+        // 2. If user doesn't exist, sign them up
+        if (signInRes.error && (signInRes.error.message.includes('Invalid login credentials') || signInRes.error.message.includes('User not found'))) {
+          console.log("AuthContext: Student does not exist in Supabase Auth, signing them up...");
+          const signUpRes = await supabase.auth.signUp({
+            email: studentEmail,
+            password: studentPassword,
+            options: {
+              data: {
+                full_name: student.name,
+              }
+            }
+          });
+
+          if (signUpRes.error) throw signUpRes.error;
+          authUser = signUpRes.data.user;
+        } else if (signInRes.error) {
+          throw signInRes.error;
+        } else {
+          authUser = signInRes.data.user;
+        }
+
+        if (!authUser) throw new Error("No user returned from Supabase Auth");
+
+        // 3. Upsert profile in profiles table
+        const profileData = {
+          id: authUser.id,
+          email: studentEmail,
+          name: student.name,
+          updated_at: new Date().toISOString()
+        };
+        await supabase.from('profiles').upsert(profileData);
+
+        const appUser: AppUser = {
+          id: authUser.id,
+          uid: authUser.id,
+          email: studentEmail,
+          displayName: student.name,
+          photoURL: null,
+          user_metadata: { full_name: student.name }
+        };
+
+        setUser(appUser);
+        setRole('student');
+        setProjectMode(mode);
+
+        localStorage.setItem('dari_role', 'student');
+        localStorage.setItem('dari_project_mode', mode);
+        localStorage.setItem('dari_mock_user', JSON.stringify(appUser));
+        setLoading(false);
+        return true;
+      } catch (err: any) {
+        console.error("AuthContext student login error:", err);
+        setAuthError(err.message || "Erro na autenticação com o servidor.");
+        setLoading(false);
+        return false;
+      }
     } else {
       setAuthError("Nombre o PIN incorrectos.");
       return false;
@@ -189,8 +273,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loginWithRole = (newRole: UserRole) => {
     setRole(newRole);
-    if (newRole) localStorage.setItem('dari_role', newRole);
-    else localStorage.removeItem('dari_role');
+    if (newRole) {
+      localStorage.setItem('dari_role', newRole);
+      if (newRole === 'admin') {
+        const mockAdmin = {
+          id: '49f4c398-7cf1-4541-ba66-f045cf7b719e',
+          uid: '49f4c398-7cf1-4541-ba66-f045cf7b719e',
+          email: 'willians.souza@escola.pr.gov.br',
+          displayName: 'Admin (Bypass)',
+          photoURL: null,
+          user_metadata: { full_name: 'Admin (Bypass)' }
+        };
+        
+        supabase.from('profiles').upsert({
+          id: '49f4c398-7cf1-4541-ba66-f045cf7b719e',
+          email: 'willians.souza@escola.pr.gov.br',
+          name: 'Admin (Bypass)',
+          updated_at: new Date().toISOString()
+        }).then(({ error }) => {
+          if (error) console.error("Error upserting mock admin profile:", error);
+        });
+
+        setUser(mockAdmin);
+        localStorage.setItem('dari_mock_user', JSON.stringify(mockAdmin));
+      }
+    } else {
+      localStorage.removeItem('dari_role');
+    }
   };
 
   const handleSetProjectMode = (mode: ProjectMode | null) => {
@@ -204,9 +313,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     try {
-      await signOut(auth);
+      await supabase.auth.signOut();
     } catch (err) {
-      console.error("Error signing out from Firebase:", err);
+      console.error("Error signing out from Supabase:", err);
     }
     setRole(null);
     setUser(null);

@@ -19,8 +19,7 @@ import { useDariData } from './hooks/useData';
 import { useStudentJourney } from './hooks/useStudentJourney';
 import { speechService } from './utils/speech';
 import { DEFAULT_UNITS } from './constants/index';
-import { db } from './services/firebase';
-import { setDoc, doc } from 'firebase/firestore';
+import { supabase } from './services/supabase';
 
 export const App: React.FC = () => {
   useEffect(() => {
@@ -39,7 +38,7 @@ export const App: React.FC = () => {
     return found;
   }, [projectMode]);
   const [activeTab, setActiveTab] = useState<'adventure' | 'activities' | 'planning' | 'chat' | 'settings' | 'whatsapp'>('adventure');
-  const [activeUnit, setActiveUnit] = useState<Unit | null>(null);
+  const [activeUnitId, setActiveUnitId] = useState<string | null>(null);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [celebration, setCelebration] = useState<{ xp: number, stars: number } | null>(null);
   const [editingUnitId, setEditingUnitId] = useState<string | null>(null);
@@ -49,10 +48,12 @@ export const App: React.FC = () => {
     saveAnswer, saveSession, updateSession, deleteSession, resetUnitAnswers, updateUnit, createUnit, refresh
   } = useDariData();
 
-  const hasSynced = useRef(false);
+  const activeUnit = useMemo(() => {
+    return units.find(u => u.id === activeUnitId) || null;
+  }, [activeUnitId, units]);
   
-  const handleGoHome = useCallback(() => setActiveUnit(null), []);
-  const handleToggle = useCallback(() => setActiveUnit(null), []);
+  const handleGoHome = useCallback(() => setActiveUnitId(null), []);
+  const handleToggle = useCallback(() => setActiveUnitId(null), []);
   const handleGoAdventure = useCallback(() => setActiveTab('adventure'), []);
 
   const importDefaults = async () => {
@@ -60,11 +61,13 @@ export const App: React.FC = () => {
       console.log("App: Iniciando sincronização total de 12 unidades...");
       let count = 0;
       for (const unit of DEFAULT_UNITS) {
-        // Forçamos o envio completo de cada unidade
-        await setDoc(doc(db, 'units', unit.id), {
+        const { error } = await supabase.from('units').upsert({
           ...unit,
-          updatedAt: new Date().toISOString()
-        }); // Removido o merge para garantir que os dados subam limpos
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'id' });
+        
+        if (error) throw error;
+        
         count++;
         console.log(`App: Sincronizada ${count}/12: ${unit.title}`);
       }
@@ -77,30 +80,8 @@ export const App: React.FC = () => {
     }
   };
 
-  // Sincronização Inteligente de Unidades
-  useEffect(() => {
-    const syncUnits = async () => {
-      // Sincroniza se for admin e não tiver as 12 aulas completas
-      if (role === 'admin' && units && units.length < 12) {
-        console.log(`App: Detectadas apenas ${units.length} aulas. Sincronizando currículo completo...`);
-        try {
-          for (const defaultUnit of DEFAULT_UNITS) {
-            const existing = units.find(u => u.id === defaultUnit.id);
-            if (!existing || existing.title !== defaultUnit.title) {
-              await setDoc(doc(db, 'units', defaultUnit.id), {
-                ...defaultUnit,
-                updatedAt: new Date().toISOString()
-              });
-            }
-          }
-          if (refresh) refresh();
-        } catch (err) {
-          console.error("App: Erro na sincronização automática:", err);
-        }
-      }
-    };
-    syncUnits();
-  }, [units, role, refresh]);
+  // Remoção da sincronização automática em segundo plano para evitar sobrescrever edições dos usuários.
+  // A sincronização de currículo padrão agora é realizada exclusivamente de forma manual via botões na UI.
 
   // Student Journey Hook for rewards
   const { stats, addStudentRewards } = useStudentJourney(user?.id || '');
@@ -309,7 +290,7 @@ export const App: React.FC = () => {
 
         <button 
           className={`nav-link-kids adventure ${activeTab === 'adventure' ? 'active' : ''}`}
-          onClick={() => { setActiveTab('adventure'); setActiveUnit(null); }}
+          onClick={() => { setActiveTab('adventure'); setActiveUnitId(null); }}
           style={{ justifyContent: 'center', textAlign: 'center' }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -331,7 +312,7 @@ export const App: React.FC = () => {
 
         <button 
           className={`nav-link-kids whatsapp ${activeTab === 'whatsapp' ? 'active' : ''}`}
-          onClick={() => { setActiveTab('whatsapp'); setActiveUnit(null); }}
+          onClick={() => { setActiveTab('whatsapp'); setActiveUnitId(null); }}
           style={{ justifyContent: 'center', textAlign: 'center' }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -358,7 +339,7 @@ export const App: React.FC = () => {
             <Dashboard
               onNavigate={(screen, unitId) => {
                 const unit = sortedUnits.find(u => u.id === unitId);
-                if (unit) setActiveUnit(unit);
+                if (unit) setActiveUnitId(unit.id);
               }}
               completedPct={completedPct}
               sessionsCount={sessions.length}
